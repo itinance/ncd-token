@@ -34,15 +34,16 @@ contract("CrowdSale tests", async ([_, owner, pauser1, pauser2,  ...otherAccount
         tokenSale = await NCDTokenSale_.new({from: owner});
         await tokenSale.initialize(openingTime, closingTime, token.address);
 
+
         console.log(5)
 
         await token.addMinter(tokenSale.address, {from: owner});
-        console.log(6)
         await token.renounceMinter({ from: owner });
 
         console.log(7)
 
     });
+
 
 //    describe("Initiating token sale", function() {
 
@@ -55,16 +56,14 @@ contract("CrowdSale tests", async ([_, owner, pauser1, pauser2,  ...otherAccount
         });
 
         it('Timelock can be added', async function() {
-          //(await token.isMinter(owner)).should.equal(false);
           await tokenSale.addTimelock(afterClosingTime);
         })
 
         it('token can be minted in the crowdsale', async function() {
-            tokenSale.mintTokens(buyer, 1000);
+            await tokenSale.mintTokens(buyer, 1000);
 
             const balance = await token.balanceOf(buyer);
             expect(balance).to.be.bignumber.equal('1000');
-
         })
 //    })
 
