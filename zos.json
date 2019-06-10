@@ -1,0 +1,14 @@
+{
+  "zosversion": "2.2",
+  "name": "ncdt",
+  "version": "1.0.0",
+  "contracts": {
+    "Counter": "Counter",
+    "Wallet": "Wallet",
+    "NCDToken": "NCDToken",
+    "TeamVesting": "TeamVesting"
+  },
+  "dependencies": {
+    "openzeppelin-eth": "^2.1.3"
+  }
+}
