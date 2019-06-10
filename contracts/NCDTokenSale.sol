@@ -30,10 +30,6 @@ contract NCDTokenSale is Initializable, Ownable {
 
     event TeamVestingAssigned(address teamVesting);
 
-    uint256 private _grantedTeamTokenAvailable;
-    uint256 private _grantedTeamTokenTotal;
-
-
     function initialize(uint256 openingTime, uint256 closingTime, NCDToken token) public initializer {
         require(address(token) != address(0));
 
@@ -45,7 +41,14 @@ contract NCDTokenSale is Initializable, Ownable {
 
         _openingTime = openingTime;
         _closingTime = closingTime;
+    }
 
+    function getOpeningTime() public view returns (uint256) {
+        return _openingTime;
+    }
+
+    function getClosingTime() public view returns (uint256) {
+        return _closingTime;
     }
 
     function addTimelock(uint256 releaseTime) public {
