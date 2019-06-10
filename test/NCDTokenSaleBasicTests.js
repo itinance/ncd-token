@@ -20,7 +20,7 @@ contract("CrowdSale tests basic", async ([_, owner, pauser1, pauser2,  ...otherA
         afterClosingTime = closingTime.add(time.duration.seconds(1));
 
         token = await NCDToken.new({from: owner});
-        token.initialize( owner, [pauser1, pauser2]);
+        await token.initialize( owner, [pauser1, pauser2]);
     });
 
     it('reverts if the opening time is in the past', async function () {
