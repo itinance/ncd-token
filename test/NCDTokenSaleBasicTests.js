@@ -1,13 +1,9 @@
-const truffleAssert = require('truffle-assertions');
 const { BN, ether, constants, expectEvent, shouldFail, time } = require('openzeppelin-test-helpers');
-const should = require('chai').should();
-const { expect } = require('chai');
 const { ZERO_ADDRESS } = constants;
+
 
 const NCDToken = artifacts.require('NCDToken');
 const NCDTokenSale = artifacts.require('NCDTokenSaleImpl');
-
-const NCDTokenSale_ = artifacts.require('NCDTokenSale');
 
 contract("CrowdSale tests basic", async ([_, owner, pauser1, pauser2,  ...otherAccounts]) => {
     let token, tokenSale,
@@ -19,12 +15,9 @@ contract("CrowdSale tests basic", async ([_, owner, pauser1, pauser2,  ...otherA
     const notAPauser = otherAccounts[1];
 
     beforeEach(async function () {
-        openingTime = (await time.latest()).add(time.duration.weeks(1));
+        openingTime = await time.latest();
         closingTime = openingTime.add(time.duration.weeks(1));
         afterClosingTime = closingTime.add(time.duration.seconds(1));
-
-        //token = await NCDToken.new({from: owner});
-        //token.initialize( owner, [pauser1, pauser2]);
 
         token = await NCDToken.new({from: owner});
         token.initialize( owner, [pauser1, pauser2]);
