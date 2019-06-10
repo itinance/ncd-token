@@ -14,7 +14,7 @@ contract("TeamVesting", async ([_, owner, ...otherAccounts]) => {
 
     beforeEach(async function () {
         vesting = await TeamVesting.new({from: owner});
-        vesting.initialize(owner);
+        await vesting.initialize(owner);
         await vesting.addBeneficiaries([vestor1, vestor2], [93, 7], {from: owner});
     });
 

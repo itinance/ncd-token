@@ -18,7 +18,7 @@ contract("CrowdSale tests", async ([_, owner, pauser1, pauser2,  ...otherAccount
 
     beforeEach(async function () {
         token = await NCDToken.new({from: owner});
-        token.initialize( owner, [pauser1, pauser2]);
+        await token.initialize( owner, [pauser1, pauser2]);
 
         openingTime = await time.latest();
         closingTime = openingTime.add(time.duration.years(1));
@@ -32,7 +32,7 @@ contract("CrowdSale tests", async ([_, owner, pauser1, pauser2,  ...otherAccount
 
         //tokenSale = await NCDTokenSale.new(openingTime, closingTime, token.address, {from: owner});
         tokenSale = await NCDTokenSale_.new({from: owner});
-        tokenSale.initialize(openingTime, closingTime, token.address);
+        await tokenSale.initialize(openingTime, closingTime, token.address);
 
         console.log(5)
 

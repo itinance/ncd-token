@@ -15,7 +15,7 @@ contract("NCDToken", async ([_, owner, minter, pauser1, pauser2, ...otherAccount
 
     beforeEach(async function () {
         token = await NCDToken.new({from: owner});
-        token.initialize( minter, [pauser1, pauser2]);
+        await token.initialize( minter, [pauser1, pauser2]);
     });
 
     it("it can be paused by Pauser 1", async () => {

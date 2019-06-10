@@ -5,7 +5,6 @@ const should = require('chai').should();
 const NCDToken = artifacts.require('NCDToken');
 
 contract("NCDTokenMinting", async ([_, owner, ...otherAccounts]) => {
-
     let token;
 
     const minter1 = otherAccounts[0];
@@ -22,7 +21,7 @@ contract("NCDTokenMinting", async ([_, owner, ...otherAccounts]) => {
 
     beforeEach(async function () {
         token = await NCDToken.new({from: owner});
-        token.initialize( minter1, [pauser1, pauser2]);
+        await token.initialize( minter1, [pauser1, pauser2]);
     });
 
     it("minting works generally", async () => {
