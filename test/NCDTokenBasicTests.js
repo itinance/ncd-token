@@ -75,7 +75,7 @@ contract("NCDToken", async ([_, owner, minter, pauser1, pauser2, ...otherAccount
         let balance = await token.balanceOf(buyer);
         expect(balance).to.be.bignumber.equal('0');
 
-        token.mint(buyer, 1000, {from: minter});
+        await token.mint(buyer, 1000, {from: minter});
 
         balance = await token.balanceOf(buyer);
         expect(balance).to.be.bignumber.equal('1000');
@@ -89,7 +89,7 @@ contract("NCDToken", async ([_, owner, minter, pauser1, pauser2, ...otherAccount
         let balance = await token.balanceOf(buyer);
         expect(balance).to.be.bignumber.equal('0');
 
-        token.mint(buyer, 1000, {from: notAMinter});
+        await token.mint(buyer, 1000, {from: notAMinter});
 
         balance = await token.balanceOf(buyer);
         expect(balance).to.be.bignumber.equal('1000');

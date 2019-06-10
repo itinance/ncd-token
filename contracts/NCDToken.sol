@@ -26,7 +26,7 @@ contract NCDToken is ERC20Detailed, ERC20Mintable, ERC20Pausable {
     }
 
     function () external payable {
-        revert();
+        //revert();
     }
 
     /**
