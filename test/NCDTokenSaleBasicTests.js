@@ -20,7 +20,7 @@ contract("CrowdSale tests basic", async ([_, owner, pauser1, pauser2,  ...otherA
     });
 
     beforeEach(async function () {
-        openingTime = await time.latest();
+        openingTime = (await time.latest()).add(time.duration.weeks(1));
         closingTime = openingTime.add(time.duration.weeks(1));
         afterClosingTime = closingTime.add(time.duration.seconds(1));
 
