@@ -16,6 +16,11 @@ contract("CrowdSale tests", async ([_, owner, pauser1, pauser2,  ...otherAccount
 
     const buyer = otherAccounts[1];
 
+    before(async function () {
+      // Advance to the next block to correctly read time in the solidity "now" function interpreted by ganache
+      await time.advanceBlock();
+    });
+
     beforeEach(async function () {
         token = await NCDToken.new({from: owner});
         await token.initialize( owner, [pauser1, pauser2]);
