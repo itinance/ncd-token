@@ -36,8 +36,8 @@ contract NCDTokenSale is Initializable, Ownable {
         _token = token;
 
         // solhint-disable-next-line not-rely-on-time
-        require(openingTime >= block.timestamp - 1); // in order to make this testable with Ganache, we have to reduce a second
-        require(closingTime > openingTime);
+        require(openingTime >= block.timestamp, "NCDTokenSale: opening time is before current time");
+        require(closingTime > openingTime, "NCDTokenSale: opening time is not before closing time");
 
         _openingTime = openingTime;
         _closingTime = closingTime;
