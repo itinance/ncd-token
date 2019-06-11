@@ -14,6 +14,11 @@ contract("CrowdSale tests basic", async ([_, owner, pauser1, pauser2,  ...otherA
 
     const notAPauser = otherAccounts[1];
 
+    before(async function () {
+      // Advance to the next block to correctly read time in the solidity "now" function interpreted by ganache
+      await time.advanceBlock();
+    });
+
     beforeEach(async function () {
         openingTime = await time.latest();
         closingTime = openingTime.add(time.duration.weeks(1));
@@ -23,24 +28,24 @@ contract("CrowdSale tests basic", async ([_, owner, pauser1, pauser2,  ...otherA
         await token.initialize( owner, [pauser1, pauser2]);
     });
 
-/*    it('reverts if the opening time is in the past', async function () {
+    it('reverts if the opening time is in the past', async function () {
       await shouldFail.reverting(NCDTokenSale.new(
-        (await time.latest()).sub(time.duration.days(1)), closingTime, owner, token.address
+        (await time.latest()).sub(time.duration.days(1)), closingTime, token.address
       ));
     });
 
     it('reverts if the closing time is before the opening time', async function () {
       await shouldFail.reverting(NCDTokenSale.new(
-        openingTime, openingTime.sub(time.duration.seconds(1)), owner, token.address
+        openingTime, openingTime.sub(time.duration.seconds(1)), token.address
       ));
     });
 
     it('reverts if the closing time equals the opening time', async function () {
       await shouldFail.reverting(NCDTokenSale.new(
-        openingTime, openingTime, owner, token.address
+        openingTime, openingTime, token.address
       ));
     });
-*/
+
     it('reverts if the token is a zero address', async function () {
       await shouldFail.reverting(NCDTokenSale.new(
         openingTime, openingTime, ZERO_ADDRESS
