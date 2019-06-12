@@ -16,13 +16,22 @@ contract NCDTokenSale is Initializable, Ownable {
     uint256 private _openingTime;
     uint256 private _closingTime;
 
-    TokenTimelock private _timeLock;
+    uint256 private _teamTokensTotal;
+    uint256 private _teamTokensUnreleased;
+    uint256 private _teamTokensReleased;
+
+    TokenTimelock[] private _timeLocks;
+    uint256[] private _vestingPeriodsStart;
+
+    event VestingLockAdded(uint256 vestingPeriodStart, uint256 releaseTime);
+
+    event VestedTokensWithdrawed(uint256 indexed timestampOfRequest, uint256 vestingPeriodStart, uint256 releaseTime, uint256 amount);
 
     /**
      * @dev Reverts if not in crowdsale time range.
      */
     modifier onlyWhileOpen {
-        require(isOpen());
+        require(isOpen(), "NCDTokenSale: CrowdSale is closed" );
         _;
     }
 
@@ -31,16 +40,28 @@ contract NCDTokenSale is Initializable, Ownable {
     event TeamVestingAssigned(address teamVesting);
 
     function initialize(uint256 openingTime, uint256 closingTime, NCDToken token) public initializer {
-        require(address(token) != address(0));
+        require(address(token) != address(0), "NCDTokenSale: Zero-Address for token is invalid");
 
         _token = token;
 
         // solhint-disable-next-line not-rely-on-time
-        require(openingTime >= block.timestamp, "NCDTokenSale: opening time is before current time");
+        require(openingTime >= block.timestamp - 1, "NCDTokenSale: opening time is before current time");
         require(closingTime > openingTime, "NCDTokenSale: opening time is not before closing time");
 
         _openingTime = openingTime;
         _closingTime = closingTime;
+    }
+
+    function getTeamTokensTotal() public view returns (uint256) {
+        return _teamTokensTotal;
+    }
+
+    function getTeamTokensReleased() public view returns (uint256) {
+        return _teamTokensReleased;
+    }
+
+    function getTeamTokensUnreleased() public view returns (uint256) {
+        return _teamTokensUnreleased;
     }
 
     function getOpeningTime() public view returns (uint256) {
@@ -50,12 +71,6 @@ contract NCDTokenSale is Initializable, Ownable {
     function getClosingTime() public view returns (uint256) {
         return _closingTime;
     }
-
-    function addTimelock(uint256 releaseTime) public {
-        _timeLock = new TokenTimelock();
-        _timeLock.initialize(_token, address(_teamVesting), releaseTime );
-    }
-
 
     /**
      * @return the token being sold.
@@ -98,20 +113,65 @@ contract NCDTokenSale is Initializable, Ownable {
      * @param tokenAmount Number of tokens to be minted
      */
     function mintTokens(address beneficiary, uint256 tokenAmount) public onlyWhileOpen {
+        _teamTokensTotal = _teamTokensTotal.add(tokenAmount);
+        _teamTokensUnreleased = _teamTokensUnreleased.add(tokenAmount);
+
         require(NCDToken(address(token())).mint(beneficiary, tokenAmount));
     }
 
-    function withdrawVestedTokens(uint256 period) public returns(uint256) {
+    function addVestingLock(uint256 vestingPeriodStart, uint256 releaseTime) public {
+        require(vestingPeriodStart < releaseTime);
+        // TODO: check also for overlapping periods)
+
+        TokenTimelock timeLock = new TokenTimelock();
+        timeLock.initialize(_token, address(_teamVesting), releaseTime );
+
+        _vestingPeriodsStart.push(vestingPeriodStart);
+        _timeLocks.push(timeLock);
+
+        emit VestingLockAdded(vestingPeriodStart, releaseTime);
+    }
+
+    function findTokenTimelock(uint256 timestamp) public view returns (uint256, uint256, TokenTimelock) {
+        for(uint256 i = 0; i < _vestingPeriodsStart.length; i++) {
+            uint256 vestingPeriodStart = _vestingPeriodsStart[i];
+            if(vestingPeriodStart <= timestamp) {
+                TokenTimelock timeLock = _timeLocks[i];
+                if(timeLock.releaseTime() >= timestamp) {
+                    return (vestingPeriodStart, timeLock.releaseTime(), timeLock);
+                }
+            }
+        }
+        revert("No suitable TokenTimelock found");
+    }
+
+    function withdrawVestedTokensByTimestamp(uint256 timestamp) public returns(uint256) {
     //    require(msg.sender == _teamVesting);
 
-        // calc amount of vestable token that was granted in a specific period
-        //uint256 amount = _vestedBalancePerPeriod[period];
+        // _teamTokensUnreleased represents our amount of token that can be released into TimeLockVesting
+        uint256 amount = _teamTokensUnreleased;
 
-        // mint these tokens into the vesting contract
-        //super._mint(address(_teamVesting), amount);
+        // find the appropriate TimeLock according to the  timestamp
 
-        //_vestedBalancePerPeriod[period] = _vestedBalancePerPeriod[period].sub(amount);
-        //return amount;
+        (uint256 _vestingPeriodStart, uint256 _releaseTime, TokenTimelock timeLock) = findTokenTimelock(timestamp);
+
+        require(_vestingPeriodStart <= timestamp, "Invalid _vestingPeriodStart was found");
+
+        //require(timestamp <= timeLock.releaseTime(), "Invalid _vestingPeriodStart was found");
+
+        // reset unreleased tokens
+        _teamTokensUnreleased = 0;
+
+        // increment released tokens by amount
+        _teamTokensReleased = _teamTokensReleased.add(amount);
+
+        // mint these tokens into the timelock contract for its vesting period
+//        super._mint(address(timeLock), amount);
+        require(NCDToken(address(token())).mint(address(timeLock), amount));
+
+        emit VestedTokensWithdrawed(timestamp, _vestingPeriodStart, _releaseTime, amount);
+
+        return amount;
     }
 
 
