@@ -11,20 +11,6 @@ const NCDTokenSale = artifacts.require('NCDTokenSale');
 
 
 contract("CrowdSale TeamToken tests", async ([_, owner, buyer, another, pauser1, pauser2,  ...otherAccounts]) => {
-    let token, tokenSale,
-
-      // Define time range of the crows sale
-      openingTime = (await time.latest()).add(time.duration.weeks(1)),
-      closingTime = openingTime.add(time.duration.years(1)),
-      afterClosingTime = closingTime.add(time.duration.seconds(1)),
-
-    // define vesting periods with a length of 10 days
-      vestingStart1 = openingTime,
-      vestingRelease1 = vestingStart1.add(time.duration.days(10)),
-
-      vestingStart2 = vestingRelease1.add(time.duration.seconds(1)),
-      vestingRelease2 = vestingStart2.add(time.duration.days(10))
-    ;
 
     before(async function () {
       // Advance to the next block to correctly read time in the solidity "now" function interpreted by ganache
@@ -32,60 +18,85 @@ contract("CrowdSale TeamToken tests", async ([_, owner, buyer, another, pauser1,
     });
 
     beforeEach(async function () {
-        token = await NCDToken.new({from: owner});
-        await token.initialize( owner, [pauser1, pauser2]);
 
-        tokenSale = await NCDTokenSale.new({from: owner});
-        await tokenSale.initialize(openingTime, closingTime, token.address);
+      // Define time range of the crows sale
+      this.openingTime = (await time.latest()).add(time.duration.weeks(1));
+      this.closingTime = this.openingTime.add(time.duration.years(1));
+      this.afterClosingTime = this.closingTime.add(time.duration.seconds(1));
 
-        await token.addMinter(tokenSale.address, {from: owner});
-        await token.renounceMinter({ from: owner });
+    // define vesting periods with a length of 10 days
+      this.vestingStart1 = this.openingTime;
+      this.vestingRelease1 = this.vestingStart1.add(time.duration.days(10));
+
+      this.vestingStart2 = this.vestingRelease1.add(time.duration.seconds(1));
+      this.vestingRelease2 = this.vestingStart2.add(time.duration.days(10));
+
+      this.token = await NCDToken.new({from: owner});
+      await this.token.initialize( owner, [pauser1, pauser2]);
+
+      this.tokenSale = await NCDTokenSale.new({from: owner});
+      await this.tokenSale.initialize(this.openingTime, this.closingTime, this.token.address);
+
+      await this.token.addMinter(this.tokenSale.address, {from: owner});
+      await this.token.renounceMinter({ from: owner });
     });
 
     context('once deployed', function () {
         beforeEach(async function () {
           // Prepare vesting Locks
-          await tokenSale.addVestingLock(vestingStart1, vestingRelease1);
-          await tokenSale.addVestingLock(vestingStart2, vestingRelease2);
+          await this.tokenSale.addVestingLock(this.vestingStart1, this.vestingRelease1);
+          await this.tokenSale.addVestingLock(this.vestingStart2, this.vestingRelease2);
 
-          await time.increaseTo(openingTime);
+          await time.increaseTo(this.openingTime);
           await time.advanceBlock();
 
           // minting 1000 tokens
-          await tokenSale.mintTokens(buyer, 1000);
+          await this.tokenSale.mintTokens(buyer, 1000);
         });
 
         it('will find the appropriate TokenTimelock for specific timestamps', async function() {
-          const timestamp = vestingStart1.add(time.duration.days(5));
+          let timestamp = this.vestingStart1.add(time.duration.days(5));
 
-          const result =  await tokenSale.findTokenTimelock(timestamp);
+          let result =  await this.tokenSale.findTokenTimelock(timestamp);
 
-          const periodStart = result[0];
-          const releaseTime = result[1];
+          let periodStart = result[0],
+            releaseTime = result[1];
 
-          expect(periodStart).to.be.bignumber.equal(vestingStart1);
-          expect(releaseTime).to.be.bignumber.equal(vestingRelease1);
+          expect(periodStart).to.be.bignumber.equal(this.vestingStart1);
+          expect(releaseTime).to.be.bignumber.equal(this.vestingRelease1);
+
+          // lets try to find the second period
+          timestamp = this.vestingStart2.add(time.duration.days(5));
+
+          result =  await this.tokenSale.findTokenTimelock(timestamp);
+
+          periodStart = result[0];
+          releaseTime = result[1];
+
+          expect(periodStart).to.be.bignumber.equal(this.vestingStart2);
+          expect(releaseTime).to.be.bignumber.equal(this.vestingRelease2);
+
         });
 
         it('virtual team tokens are growing as long as not released', async function() {
-            let balance = await token.balanceOf(buyer);
+            let balance = await this.token.balanceOf(buyer);
             expect(balance).to.be.bignumber.equal('1000');
 
             // Team Tokens was counted the right way
-            expect(await tokenSale.getTeamTokensTotal()).to.be.bignumber.equal('1000');
-            expect(await tokenSale.getTeamTokensUnreleased()).to.be.bignumber.equal('1000');
-            expect(await tokenSale.getTeamTokensReleased()).to.be.bignumber.equal('0');
+            expect(await this.tokenSale.getTeamTokensTotal()).to.be.bignumber.equal('1000');
+            expect(await this.tokenSale.getTeamTokensUnreleased()).to.be.bignumber.equal('1000');
+            expect(await this.tokenSale.getTeamTokensReleased()).to.be.bignumber.equal('0');
 
             // minting 1000 tokens
-            await tokenSale.mintTokens(another, 500);
+            await this.tokenSale.mintTokens(another, 500);
 
-            balance = await token.balanceOf(another);
+            balance = await this.token.balanceOf(another);
             expect(balance).to.be.bignumber.equal('500');
 
             // Team Tokens was counted the right way
-            expect(await tokenSale.getTeamTokensTotal()).to.be.bignumber.equal('1500');
-            expect(await tokenSale.getTeamTokensUnreleased()).to.be.bignumber.equal('1500');
-            expect(await tokenSale.getTeamTokensReleased()).to.be.bignumber.equal('0');
+            expect(await this.tokenSale.getTeamTokensTotal()).to.be.bignumber.equal('1500');
+            expect(await this.tokenSale.getTeamTokensUnreleased()).to.be.bignumber.equal('1500');
+            expect(await this.tokenSale.getTeamTokensReleased()).to.be.bignumber.equal('0');
         })
     })
 
