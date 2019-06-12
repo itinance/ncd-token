@@ -25,7 +25,8 @@ contract NCDTokenSale is Initializable, Ownable {
 
     event VestingLockAdded(uint256 vestingPeriodStart, uint256 releaseTime);
 
-    event VestedTokensWithdrawed(uint256 indexed timestampOfRequest, uint256 vestingPeriodStart, uint256 releaseTime, uint256 amount);
+    event VestedTokensWithdrawed(uint256 indexed timestampOfRequest, address indexed timeLockAddress, uint256 vestingPeriodStart,
+        uint256 releaseTime, uint256 amount);
 
     /**
      * @dev Reverts if not in crowdsale time range.
@@ -145,6 +146,11 @@ contract NCDTokenSale is Initializable, Ownable {
         revert("No suitable TokenTimelock found");
     }
 
+    function getTimeLockAddress(uint256 timestamp) public view returns (address) {
+        (uint256 vestingPeriodStart, uint256 releaseTime, TokenTimelock timeLock) = findTokenTimelock(timestamp);
+        return address(timeLock);
+    }
+
     function withdrawVestedTokensByTimestamp(uint256 timestamp) public returns(uint256) {
     //    require(msg.sender == _teamVesting);
 
@@ -153,9 +159,9 @@ contract NCDTokenSale is Initializable, Ownable {
 
         // find the appropriate TimeLock according to the  timestamp
 
-        (uint256 _vestingPeriodStart, uint256 _releaseTime, TokenTimelock timeLock) = findTokenTimelock(timestamp);
+        (uint256 vestingPeriodStart, uint256 releaseTime, TokenTimelock timeLock) = findTokenTimelock(timestamp);
 
-        require(_vestingPeriodStart <= timestamp, "Invalid _vestingPeriodStart was found");
+        require(vestingPeriodStart <= timestamp, "Invalid _vestingPeriodStart was found");
 
         //require(timestamp <= timeLock.releaseTime(), "Invalid _vestingPeriodStart was found");
 
@@ -166,10 +172,9 @@ contract NCDTokenSale is Initializable, Ownable {
         _teamTokensReleased = _teamTokensReleased.add(amount);
 
         // mint these tokens into the timelock contract for its vesting period
-//        super._mint(address(timeLock), amount);
-        require(NCDToken(address(token())).mint(address(timeLock), amount));
+        require(NCDToken(address(token())).mint(address(timeLock), amount), "NCDTokenSale: tokens could not minted into timelock");
 
-        emit VestedTokensWithdrawed(timestamp, _vestingPeriodStart, _releaseTime, amount);
+        emit VestedTokensWithdrawed(timestamp, address(timeLock), vestingPeriodStart, releaseTime, amount);
 
         return amount;
     }
