@@ -5,7 +5,6 @@ const { expect } = require('chai');
 
 const NCDToken = artifacts.require('NCDToken');
 
-
 contract("NCDToken", async ([_, owner, minter, pauser1, pauser2, ...otherAccounts]) => {
     let token;
 
