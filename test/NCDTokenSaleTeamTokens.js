@@ -288,13 +288,21 @@ contract("CrowdSale TeamToken tests", async ([_, owner, buyer, another, pauser1,
             expect(await this.token.balanceOf(this.timeLock1)).to.be.bignumber.equal('0');
           })
 
-          it('release token by another user is denied', async function() {
+          it('release token by another is also allowed and okay, because they go into the right account', async function() {
             let timestampOfRequest = this.vestingStart1.add(time.duration.days(4));
             const tokenLockAddress = await this.tokenSale.getTimeLock(timestampOfRequest);
             const tokenLock = await TokenTimelock.at(tokenLockAddress);
 
             await this.tokenSale.withdrawVestedTokensByTimestamp( timestampOfRequest );
-            await shouldFail.reverting( tokenLock.release({from: another}) );
+
+            // Balance of vesting contract is still zero
+            expect(await this.token.balanceOf(this.vesting.address)).to.be.bignumber.equal('0');
+
+            await time.increaseTo(this.vestingRelease2.add(time.duration.seconds(1)));
+            await tokenLock.release({from: another});
+
+            // Balance of vesting contract is now 1000
+            expect(await this.token.balanceOf(this.vesting.address)).to.be.bignumber.equal('1000');
           })
 
         });
