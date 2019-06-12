@@ -127,7 +127,7 @@ contract NCDTokenSale is Initializable, Ownable {
         // TODO: check also for overlapping periods)
 
         TokenTimelock timeLock = new TokenTimelock();
-        timeLock.initialize(_token, address(_teamVesting), releaseTime );
+        timeLock.initialize(_token, _teamVesting, releaseTime );
 
         _vestingPeriodsStart.push(vestingPeriodStart);
         _timeLocks.push(timeLock);
