@@ -47,6 +47,9 @@ contract("CrowdSale TeamToken tests", async ([_, owner, buyer, another, pauser1,
           await this.tokenSale.addVestingLock(this.vestingStart1, this.vestingRelease1);
           await this.tokenSale.addVestingLock(this.vestingStart2, this.vestingRelease2);
 
+          this.timeLock1 = await this.tokenSale.getTimeLockAddress(this.vestingStart1);
+          this.timeLock2 = await this.tokenSale.getTimeLockAddress(this.vestingStart2);
+
           await time.increaseTo(this.openingTime);
           await time.advanceBlock();
 
@@ -100,7 +103,9 @@ contract("CrowdSale TeamToken tests", async ([_, owner, buyer, another, pauser1,
 
         it('Release token into TeamVesting contract works in Period 1', async function() {
             const timestampOfRequest = this.vestingRelease1.sub(time.duration.seconds(1));
-            const {logs} = await this.tokenSale.withdrawVestedTokensByTimestamp( timestampOfRequest );
+            const tx = await this.tokenSale.withdrawVestedTokensByTimestamp( timestampOfRequest );
+
+            const {logs} = tx;
 
             expectEvent.inLogs(logs, 'VestedTokensWithdrawed', {
               timestampOfRequest: timestampOfRequest,
@@ -108,6 +113,20 @@ contract("CrowdSale TeamToken tests", async ([_, owner, buyer, another, pauser1,
               releaseTime: this.vestingRelease1,
               amount: '1000'
             });
+
+            // grabbing the address of specific timelock and check the balance
+
+            const event = logs[0];
+            const {timeLockAddress} = event.args;
+
+            // it must have beed timelock 1
+            expect(timeLockAddress).to.equal(this.timeLock1);
+
+            expect(await this.token.balanceOf(this.timeLock1)).to.be.bignumber.equal('1000');
+
+            // while timelock for period 2 is still zero
+            expect(await this.token.balanceOf(this.timeLock2)).to.be.bignumber.equal('0');
+
         })
 
         it('Release token into TeamVesting contract works in Period 2 when Period 1 was forgotten to release', async function() {
@@ -123,8 +142,13 @@ contract("CrowdSale TeamToken tests", async ([_, owner, buyer, another, pauser1,
             timestampOfRequest: timestampOfRequest,
             vestingPeriodStart: this.vestingStart2,
             releaseTime: this.vestingRelease2,
-            amount: '1000'
+            amount: '1000',
+            timeLockAddress: this.timeLock2
           });
+
+          expect(await this.token.balanceOf(this.timeLock1)).to.be.bignumber.equal('0');
+          expect(await this.token.balanceOf(this.timeLock2)).to.be.bignumber.equal('1000');
+
         })
 
         it('Release token into TeamVesting contract works in Period 2 after Period 1 was forgotten to release but more tokens was minted', async function() {
@@ -144,8 +168,12 @@ contract("CrowdSale TeamToken tests", async ([_, owner, buyer, another, pauser1,
             timestampOfRequest: timestampOfRequest,
             vestingPeriodStart: this.vestingStart2,
             releaseTime: this.vestingRelease2,
-            amount: '1500'
+            amount: '1500',
+            timeLockAddress: this.timeLock2,
           });
+
+          expect(await this.token.balanceOf(this.timeLock1)).to.be.bignumber.equal('0');
+          expect(await this.token.balanceOf(this.timeLock2)).to.be.bignumber.equal('1500');
         })
 
         it('Minting token in period 1 and releasing in period 1 works as well minting more token later and release in same period', async function() {
