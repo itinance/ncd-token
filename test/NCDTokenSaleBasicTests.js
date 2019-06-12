@@ -6,13 +6,8 @@ const NCDToken = artifacts.require('NCDToken');
 const NCDTokenSale = artifacts.require('NCDTokenSaleImpl');
 
 contract("CrowdSale tests basic", async ([_, owner, pauser1, pauser2,  ...otherAccounts]) => {
-    let token, tokenSale,
+    let token,
         openingTime, closingTime, afterClosingTime;
-
-    const buyer = otherAccounts[1];
-    const notAMinter = otherAccounts[2];
-
-    const notAPauser = otherAccounts[1];
 
     before(async function () {
       // Advance to the next block to correctly read time in the solidity "now" function interpreted by ganache
@@ -30,25 +25,25 @@ contract("CrowdSale tests basic", async ([_, owner, pauser1, pauser2,  ...otherA
 
     it('reverts if the opening time is in the past', async function () {
       await shouldFail.reverting(NCDTokenSale.new(
-        (await time.latest()).sub(time.duration.days(1)), closingTime, token.address
+        owner, (await time.latest()).sub(time.duration.days(1)), closingTime, token.address
       ));
     });
 
     it('reverts if the closing time is before the opening time', async function () {
       await shouldFail.reverting(NCDTokenSale.new(
-        openingTime, openingTime.sub(time.duration.seconds(1)), token.address
+        owner, openingTime, openingTime.sub(time.duration.seconds(1)), token.address
       ));
     });
 
     it('reverts if the closing time equals the opening time', async function () {
       await shouldFail.reverting(NCDTokenSale.new(
-        openingTime, openingTime, token.address
+        owner, openingTime, openingTime, token.address
       ));
     });
 
     it('reverts if the token is a zero address', async function () {
       await shouldFail.reverting(NCDTokenSale.new(
-        openingTime, openingTime, ZERO_ADDRESS
+        owner, openingTime, openingTime, ZERO_ADDRESS
       ));
     });
 

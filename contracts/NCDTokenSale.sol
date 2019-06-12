@@ -23,7 +23,10 @@ contract NCDTokenSale is Initializable, Ownable {
     TokenTimelock[] private _timeLocks;
     uint256[] private _vestingPeriodsStart;
 
+    address private _teamVesting;
+
     event VestingLockAdded(uint256 vestingPeriodStart, uint256 releaseTime);
+    event TeamVestingAssigned(address teamVesting);
 
     event VestedTokensWithdrawed(uint256 indexed timestampOfRequest, address indexed timeLockAddress, uint256 vestingPeriodStart,
         uint256 releaseTime, uint256 amount);
@@ -32,17 +35,16 @@ contract NCDTokenSale is Initializable, Ownable {
      * @dev Reverts if not in crowdsale time range.
      */
     modifier onlyWhileOpen {
-        require(isOpen(), "NCDTokenSale: CrowdSale is closed" );
+        require(isOpen(), "NCDTokenSale: CrowdSale is closed");
         _;
     }
 
-    TeamVesting private _teamVesting;
 
-    event TeamVestingAssigned(address teamVesting);
-
-    function initialize(uint256 openingTime, uint256 closingTime, NCDToken token) public initializer {
+    function initialize(address owner, uint256 openingTime, uint256 closingTime, NCDToken token) public initializer {
         require(address(token) != address(0), "NCDTokenSale: Zero-Address for token is invalid");
+        require(owner != address(0), "NCDTokenSale: address of Owner is invalid");
 
+        Ownable.initialize(owner);
         _token = token;
 
         // solhint-disable-next-line not-rely-on-time
@@ -97,11 +99,11 @@ contract NCDTokenSale is Initializable, Ownable {
         return block.timestamp > _closingTime;
     }
 
-    function assignTeamVesting(TeamVesting teamVesting) public onlyOwner {
-        require(address(teamVesting) != address(0));
+    function assignTeamVesting(address teamVesting) public  {
+        require(teamVesting != address(0));
 
         _teamVesting = teamVesting;
-        emit TeamVestingAssigned(address(teamVesting));
+        emit TeamVestingAssigned(_teamVesting);
     }
 
     function () external payable {
@@ -149,6 +151,11 @@ contract NCDTokenSale is Initializable, Ownable {
     function getTimeLockAddress(uint256 timestamp) public view returns (address) {
         (uint256 vestingPeriodStart, uint256 releaseTime, TokenTimelock timeLock) = findTokenTimelock(timestamp);
         return address(timeLock);
+    }
+
+    function getTimeLock(uint256 timestamp) public view returns (TokenTimelock) {
+        (uint256 vestingPeriodStart, uint256 releaseTime, TokenTimelock timeLock) = findTokenTimelock(timestamp);
+        return timeLock;
     }
 
     function withdrawVestedTokensByTimestamp(uint256 timestamp) public returns(uint256) {

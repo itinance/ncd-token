@@ -29,7 +29,7 @@ contract("CrowdSale tests", async ([_, owner, pauser1, pauser2,  ...otherAccount
         afterClosingTime = closingTime.add(time.duration.seconds(1));
 
         tokenSale = await NCDTokenSale.new({from: owner});
-        await tokenSale.initialize(openingTime, closingTime, token.address);
+        await tokenSale.initialize(owner, openingTime, closingTime, token.address);
 
 
         await token.addMinter(tokenSale.address, {from: owner});
@@ -37,6 +37,10 @@ contract("CrowdSale tests", async ([_, owner, pauser1, pauser2,  ...otherAccount
 
     });
 
+    it('check ownership', async function() {
+      const o = await tokenSale.owner();
+      expect(o).to.equal(owner);
+    })
 
     it('crowdsale should be minter', async function () {
       (await token.isMinter(tokenSale.address)).should.equal(true);
