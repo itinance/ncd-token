@@ -41,13 +41,11 @@ contract("CrowdSale TeamToken tests", async ([_, owner, buyer, another, pauser1,
       await this.token.addMinter(this.tokenSale.address, {from: owner});
       await this.token.renounceMinter({ from: owner });
 
-      this.vesting = await TeamVesting.new({from: owner});
+      this.vesting = await TeamVesting.new();
       await this.vesting.initialize(owner);
       await this.vesting.addBeneficiaries([vestor1, vestor2], [93, 7], {from: owner});
 
-
       await this.tokenSale.assignTeamVesting(this.vesting.address, {from: owner});
-
     });
 
     it('is owned by Owner', async function() {
@@ -263,8 +261,7 @@ contract("CrowdSale TeamToken tests", async ([_, owner, buyer, another, pauser1,
 
         context('Release of Team Token into VestingContract', function () {
 
-          it('rtest', async function() {
-
+          it('release token and move them into VestingContract', async function() {
             let timestampOfRequest = this.vestingStart1.add(time.duration.days(4));
             const tokenLockAddress = await this.tokenSale.getTimeLock(timestampOfRequest);
             const tokenLock = await TokenTimelock.at(tokenLockAddress);
@@ -272,15 +269,37 @@ contract("CrowdSale TeamToken tests", async ([_, owner, buyer, another, pauser1,
             (await tokenLock.token()).should.be.equal(this.token.address);
             (await tokenLock.releaseTime()).should.be.bignumber.equal(this.vestingRelease1);
 
+            await this.tokenSale.withdrawVestedTokensByTimestamp( timestampOfRequest );
+
+            expect(await this.token.balanceOf(this.timeLock1)).to.be.bignumber.equal('1000');
+
             await shouldFail.reverting( tokenLock.release() );
 
+            // Balance of vesting contract is still zero
+            expect(await this.token.balanceOf(this.vesting.address)).to.be.bignumber.equal('0');
+
             await time.increaseTo(this.vestingRelease2.add(time.duration.seconds(1)));
-//            const tx = await tokenLock.release({from: this.vesting.address});
-//            console.log(tx);
+            await tokenLock.release();
+
+            // Balance of vesting contract is now 1000
+            expect(await this.token.balanceOf(this.vesting.address)).to.be.bignumber.equal('1000');
+
+            // Balance in timelock is now zero
+            expect(await this.token.balanceOf(this.timeLock1)).to.be.bignumber.equal('0');
           })
+
+          it('release token by another user is denied', async function() {
+            let timestampOfRequest = this.vestingStart1.add(time.duration.days(4));
+            const tokenLockAddress = await this.tokenSale.getTimeLock(timestampOfRequest);
+            const tokenLock = await TokenTimelock.at(tokenLockAddress);
+
+            await this.tokenSale.withdrawVestedTokensByTimestamp( timestampOfRequest );
+            await shouldFail.reverting( tokenLock.release({from: another}) );
+          })
+
         });
 
-      })
+      });
 
 
 });
