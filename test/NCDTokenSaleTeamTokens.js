@@ -303,8 +303,11 @@ contract("CrowdSale TeamToken tests", async ([_, owner, buyer, another, pauser1,
 
         context('Release of Team Token into VestingContract', function () {
 
-          it('releasing token twice in a month will get only 10% of total', async function() {
-            let timestampOfRequest = this.vestingStart1.add(time.duration.days(4));
+          it('releasing token at the end of 13th month will release 100 token as expected', async function() {
+
+            // lets withdraw team token after the first month
+
+            let timestampOfRequest = this.vestingStart1.add(time.duration.days(31).sub(time.duration.seconds(1)));
             const tokenLockAddress = await this.tokenSale.getTimeLockAddress(timestampOfRequest);
             const vesting = await TokenVesting.at(tokenLockAddress);
 
@@ -314,11 +317,39 @@ contract("CrowdSale TeamToken tests", async ([_, owner, buyer, another, pauser1,
 
             await this.tokenSale.withdrawVestedTokensByTimestamp( timestampOfRequest );
 
+            // 1000 token was minted into time lock contract
             expect(await this.token.balanceOf(this.timeLock1)).to.be.bignumber.equal('1000');
 
+            // where any release at current time would be reverted
             await shouldFail.reverting( vesting.release(this.token.address) );
 
-            expect(await vesting.totalBalance(this.token.address)).to.be.bignumber.equal('1000');
+            // Thats why the balance of vesting contract is still zero ...
+            expect(await this.token.balanceOf(this.vesting.address)).to.be.bignumber.equal('0');
+            // and in the time lock still 1000
+            expect(await this.token.balanceOf(this.timeLock1)).to.be.bignumber.equal('1000');
+
+            // but on the 31. day
+            await time.increaseTo(this.vestingRelease1.add(time.duration.days(31)));
+
+            // we are about to release 100 vested token
+            expect(await vesting.vestedAmount(this.token.address) ).to.be.bignumber.equal('100');
+
+            // so lets do it:
+            await vesting.release(this.token.address);
+
+            // Balance of vesting contract is now 100
+            expect(await this.token.balanceOf(this.vesting.address)).to.be.bignumber.equal('100');
+
+            // Balance in timelock is now 900
+            expect(await this.token.balanceOf(this.timeLock1)).to.be.bignumber.equal('900');
+          })
+
+          it('releasing token twice in a month will still get only 10% of total', async function() {
+            let timestampOfRequest = this.vestingStart1.add(time.duration.days(4));
+            const tokenLockAddress = await this.tokenSale.getTimeLockAddress(timestampOfRequest);
+            const vesting = await TokenVesting.at(tokenLockAddress);
+
+            await this.tokenSale.withdrawVestedTokensByTimestamp( timestampOfRequest );
 
             // Balance of vesting contract is still zero
             expect(await this.token.balanceOf(this.vesting.address)).to.be.bignumber.equal('0');
@@ -361,7 +392,7 @@ contract("CrowdSale TeamToken tests", async ([_, owner, buyer, another, pauser1,
             await time.increaseTo(this.vestingRelease1.add(time.duration.days(31)));
             await vesting.release(this.token.address, {from: another});
 
-            // Balance of vesting contract is now 1000
+            // Balance of vesting contract is now 100
             expect(await this.token.balanceOf(this.vesting.address)).to.be.bignumber.equal('100');
           })
 
