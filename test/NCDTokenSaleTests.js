@@ -8,11 +8,9 @@ const NCDToken = artifacts.require('NCDToken');
 
 const NCDTokenSale = artifacts.require('NCDTokenSale');
 
-contract("CrowdSale tests", async ([_, owner, pauser1, pauser2,  ...otherAccounts]) => {
+contract("CrowdSale tests", async ([_, owner, buyer, vesting, pauser1, pauser2,  ...otherAccounts]) => {
     let token, tokenSale,
         openingTime, closingTime, afterClosingTime;
-
-    const buyer = otherAccounts[1];
 
     before(async function () {
       // Advance to the next block to correctly read time in the solidity "now" function interpreted by ganache
@@ -30,6 +28,7 @@ contract("CrowdSale tests", async ([_, owner, pauser1, pauser2,  ...otherAccount
         tokenSale = await NCDTokenSale.new({from: owner});
         await tokenSale.initialize(owner, openingTime, closingTime, token.address);
 
+        await tokenSale.assignTeamVesting(vesting, {from: owner});
 
         await token.addMinter(tokenSale.address, {from: owner});
         await token.renounceMinter({ from: owner });
@@ -52,19 +51,19 @@ contract("CrowdSale tests", async ([_, owner, pauser1, pauser2,  ...otherAccount
     it('Timelock can be added', async function() {
       const
         vestingStart1 = afterClosingTime,
-        vestingRelease1 = afterClosingTime.add(time.duration.days(10)),
+        vestingRelease1 = afterClosingTime.add(time.duration.days(31*12)),
 
-        vestingStart2 = vestingRelease1.add(time.duration.seconds(1)),
-        vestingRelease2 = vestingStart2.add(time.duration.days(10))
+        vestingStart2 = vestingStart1.add(time.duration.days(31)),
+        vestingRelease2 = vestingStart2.add(time.duration.days(31*12))
         ;
 
-      let {logs} = await tokenSale.addVestingLock(vestingStart1, vestingRelease1);
+      let {logs} = await tokenSale.addVestingLock(vestingStart1);
       expectEvent.inLogs(logs, 'VestingLockAdded', {
         vestingPeriodStart: vestingStart1,
         releaseTime: vestingRelease1,
       });
 
-      const tx = await tokenSale.addVestingLock(vestingStart2, vestingRelease2);
+      const tx = await tokenSale.addVestingLock(vestingStart2);
       logs = tx.logs;
       expectEvent.inLogs(logs, 'VestingLockAdded', {
         vestingPeriodStart: vestingStart2,
@@ -73,7 +72,6 @@ contract("CrowdSale tests", async ([_, owner, pauser1, pauser2,  ...otherAccount
     })
 
     it('token can be minted in the crowdsale', async function() {
-
         // minting 1000 tokens
         await tokenSale.mintTokens(buyer, 1000);
 

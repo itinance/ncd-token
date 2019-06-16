@@ -25,8 +25,8 @@ contract("CrowdSale TeamToken tests", async ([_, owner, buyer, another, pauser1,
       this.closingTime = this.openingTime.add(time.duration.years(1));
       this.afterClosingTime = this.closingTime.add(time.duration.seconds(1));
 
-      this.cliffDuration = new BN(86400 * 365); // one year in seconds
-      this.periodLength = new BN(86400 * 31);
+      this.cliffDuration = time.duration.days(31 * 12);
+      this.periodLength = time.duration.days(31);
       this.periodRate = 10;
 
 
@@ -318,7 +318,6 @@ contract("CrowdSale TeamToken tests", async ([_, owner, buyer, another, pauser1,
 
             await shouldFail.reverting( vesting.release(this.token.address) );
 
-            console.log(2, (await vesting.totalBalance(this.token.address)).toString());
             expect(await vesting.totalBalance(this.token.address)).to.be.bignumber.equal('1000');
 
             // Balance of vesting contract is still zero
@@ -350,21 +349,20 @@ contract("CrowdSale TeamToken tests", async ([_, owner, buyer, another, pauser1,
           })
 
           it('release token by another is also allowed and okay, because they go into the right account', async function() {
-            return;
             let timestampOfRequest = this.vestingStart1.add(time.duration.days(4));
             const tokenLockAddress = await this.tokenSale.getTimeLockAddress(timestampOfRequest);
-            const tokenLock = await TokenTimelock.at(tokenLockAddress);
+            const vesting = await TokenVesting.at(tokenLockAddress);
 
             await this.tokenSale.withdrawVestedTokensByTimestamp( timestampOfRequest );
 
             // Balance of vesting contract is still zero
             expect(await this.token.balanceOf(this.vesting.address)).to.be.bignumber.equal('0');
 
-            await time.increaseTo(this.vestingRelease2.add(time.duration.seconds(1)));
-            await tokenLock.release({from: another});
+            await time.increaseTo(this.vestingRelease1.add(time.duration.days(31)));
+            await vesting.release(this.token.address, {from: another});
 
             // Balance of vesting contract is now 1000
-            expect(await this.token.balanceOf(this.vesting.address)).to.be.bignumber.equal('1000');
+            expect(await this.token.balanceOf(this.vesting.address)).to.be.bignumber.equal('100');
           })
 
         });

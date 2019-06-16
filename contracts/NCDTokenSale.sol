@@ -16,7 +16,7 @@ contract NCDTokenSale is Initializable, Ownable {
     uint256 private _openingTime;
     uint256 private _closingTime;
 
-    uint256 private constant ONE_YEAR_IN_SECONDS = 86400 * 365;
+    uint256 private constant ONE_YEAR_IN_SECONDS = 86400 * 31 * 12;
     uint256 private constant ONE_MONTH_PERIOD_IN_SECONDS = 86400 * 31; // 31 days for a ideal month
 
     uint256 private constant RELEASE_RATE_PER_MONTH = 10;
