@@ -6,6 +6,7 @@ const { ZERO_ADDRESS } = constants;
 
 const TokenTimelock = artifacts.require("TokenTimelock");
 const TeamVesting = artifacts.require("TeamVesting");
+const TokenVesting = artifacts.require("TokenVesting");
 const NCDToken = artifacts.require('NCDToken');
 const NCDTokenSale = artifacts.require('NCDTokenSale');
 
@@ -19,18 +20,22 @@ contract("CrowdSale TeamToken tests", async ([_, owner, buyer, another, pauser1,
     });
 
     beforeEach(async function () {
-
       // Define time range of the crows sale
       this.openingTime = (await time.latest()).add(time.duration.weeks(1));
       this.closingTime = this.openingTime.add(time.duration.years(1));
       this.afterClosingTime = this.closingTime.add(time.duration.seconds(1));
 
+      this.cliffDuration = new BN(86400 * 365); // one year in seconds
+      this.periodLength = new BN(86400 * 31);
+      this.periodRate = 10;
+
+
     // define vesting periods with a length of 10 days
       this.vestingStart1 = this.openingTime;
-      this.vestingRelease1 = this.vestingStart1.add(time.duration.days(10));
+      this.vestingRelease1 = this.vestingStart1.add(this.cliffDuration);
 
-      this.vestingStart2 = this.vestingRelease1.add(time.duration.seconds(1));
-      this.vestingRelease2 = this.vestingStart2.add(time.duration.days(10));
+      this.vestingStart2 = this.vestingStart1.add(time.duration.days(31));
+      this.vestingRelease2 = this.vestingStart2.add(this.cliffDuration);
 
       this.token = await NCDToken.new({from: owner});
       await this.token.initialize( owner, [pauser1, pauser2]);
@@ -48,6 +53,8 @@ contract("CrowdSale TeamToken tests", async ([_, owner, buyer, another, pauser1,
       await this.tokenSale.assignTeamVesting(this.vesting.address, {from: owner});
     });
 
+
+
     it('is owned by Owner', async function() {
       expect(await this.tokenSale.owner()).to.equal(owner);
     })
@@ -55,18 +62,47 @@ contract("CrowdSale TeamToken tests", async ([_, owner, buyer, another, pauser1,
     context('once deployed', function () {
         beforeEach(async function () {
           // Prepare vesting Locks
-          await this.tokenSale.addVestingLock(this.vestingStart1, this.vestingRelease1);
-          await this.tokenSale.addVestingLock(this.vestingStart2, this.vestingRelease2);
-
-          this.timeLock1 = await this.tokenSale.getTimeLockAddress(this.vestingStart1);
-          this.timeLock2 = await this.tokenSale.getTimeLockAddress(this.vestingStart2);
+          await this.tokenSale.addVestingLock(this.vestingStart1);
+          await this.tokenSale.addVestingLock(this.vestingStart2);
 
           await time.increaseTo(this.openingTime);
           await time.advanceBlock();
 
+          this.timeLock1 = await this.tokenSale.getTimeLockAddress(this.vestingStart1);
+          this.timeLock2 = await this.tokenSale.getTimeLockAddress(this.vestingStart2);
+
           // minting 1000 tokens
           await this.tokenSale.mintTokens(buyer, 1000);
         });
+
+        it('time locks of different vesting periods have different addresses', async function() {
+          expect( this.timeLock1 ).to.not.equal( this.timeLock2 );
+        })
+
+        it('can get state', async function() {
+          expect(this.timeLock1).to.not.equal(this.timeLock2);
+
+          const tl1 = await this.tokenSale.getTimeLockDataByIndex(0);
+
+          expect(this.timeLock1).to.equal(tl1[0]); // address
+
+          expect(this.vesting.address).to.equal(tl1[1]); // beneficiary
+          expect(this.vestingStart1).to.be.bignumber.equal(tl1[2]); // start
+          expect(this.vestingRelease1).to.be.bignumber.equal(tl1[3]); // cliff
+          expect(this.periodLength).to.be.bignumber.equal(tl1[4]); // periodLength
+          expect(this.periodRate).to.equal(tl1[5].toNumber()); // periodRate
+
+          const tl2 = await this.tokenSale.getTimeLockDataByIndex(1);
+
+          expect(this.timeLock2).to.equal(tl2[0]); // address
+
+          expect(this.vesting.address).to.equal(tl2[1]); // beneficiary
+          expect(this.vestingStart2).to.be.bignumber.equal(tl2[2]); // start
+          expect(this.vestingRelease2).to.be.bignumber.equal(tl2[3]); // cliff
+          expect(this.periodLength).to.be.bignumber.equal(tl2[4]); // periodLength
+          expect(this.periodRate).to.equal(tl2[5].toNumber()); // periodRate
+
+        })
 
         context('Collecting team tokens', function () {
 
@@ -93,6 +129,7 @@ contract("CrowdSale TeamToken tests", async ([_, owner, buyer, another, pauser1,
             expect(releaseTime).to.be.bignumber.equal(this.vestingRelease2);
           });
 
+
           it('virtual team tokens are growing as long as not released', async function() {
               let balance = await this.token.balanceOf(buyer);
               expect(balance).to.be.bignumber.equal('1000');
@@ -112,34 +149,39 @@ contract("CrowdSale TeamToken tests", async ([_, owner, buyer, another, pauser1,
               expect(await this.tokenSale.getTeamTokensTotal()).to.be.bignumber.equal('1500');
               expect(await this.tokenSale.getTeamTokensUnreleased()).to.be.bignumber.equal('1500');
               expect(await this.tokenSale.getTeamTokensReleased()).to.be.bignumber.equal('0');
+
+              expect(await this.token.balanceOf(this.timeLock1)).to.be.bignumber.equal('0');
+              expect(await this.token.balanceOf(this.timeLock2)).to.be.bignumber.equal('0');
           })
 
+
           it('Release token into TeamVesting contract works in Period 1', async function() {
-              const timestampOfRequest = this.vestingRelease1.sub(time.duration.seconds(1));
+              const timestampOfRequest = this.vestingStart2.sub(time.duration.seconds(1));
+
               const tx = await this.tokenSale.withdrawVestedTokensByTimestamp( timestampOfRequest );
 
               const {logs} = tx;
 
               expectEvent.inLogs(logs, 'VestedTokensWithdrawed', {
                 timestampOfRequest: timestampOfRequest,
+                timeLockAddress: this.timeLock1,
                 vestingPeriodStart: this.vestingStart1,
                 releaseTime: this.vestingRelease1,
                 amount: '1000'
               });
 
               // grabbing the address of specific timelock and check the balance
-
-              const event = logs[0];
-              const {timeLockAddress} = event.args;
+              const event = logs.find( e => e.event === 'VestedTokensWithdrawed' );
+              const { timeLockAddress } = event.args;
 
               // it must have beed timelock 1
               expect(timeLockAddress).to.equal(this.timeLock1);
 
+              // with a balance of 1000
               expect(await this.token.balanceOf(this.timeLock1)).to.be.bignumber.equal('1000');
 
               // while timelock for period 2 is still zero
               expect(await this.token.balanceOf(this.timeLock2)).to.be.bignumber.equal('0');
-
           })
 
           it('Release token into TeamVesting contract works in Period 2 when Period 1 was forgotten to release', async function() {
@@ -261,36 +303,56 @@ contract("CrowdSale TeamToken tests", async ([_, owner, buyer, another, pauser1,
 
         context('Release of Team Token into VestingContract', function () {
 
-          it('release token and move them into VestingContract', async function() {
+          it('releasing token twice in a month will get only 10% of total', async function() {
             let timestampOfRequest = this.vestingStart1.add(time.duration.days(4));
-            const tokenLockAddress = await this.tokenSale.getTimeLock(timestampOfRequest);
-            const tokenLock = await TokenTimelock.at(tokenLockAddress);
+            const tokenLockAddress = await this.tokenSale.getTimeLockAddress(timestampOfRequest);
+            const vesting = await TokenVesting.at(tokenLockAddress);
 
-            (await tokenLock.token()).should.be.equal(this.token.address);
-            (await tokenLock.releaseTime()).should.be.bignumber.equal(this.vestingRelease1);
+            (await vesting.cliff()).should.be.bignumber.equal(this.vestingRelease1);
+
+            expect(await this.token.balanceOf(this.timeLock1)).to.be.bignumber.equal('0');
 
             await this.tokenSale.withdrawVestedTokensByTimestamp( timestampOfRequest );
 
             expect(await this.token.balanceOf(this.timeLock1)).to.be.bignumber.equal('1000');
 
-            await shouldFail.reverting( tokenLock.release() );
+            await shouldFail.reverting( vesting.release(this.token.address) );
+
+            console.log(2, (await vesting.totalBalance(this.token.address)).toString());
+            expect(await vesting.totalBalance(this.token.address)).to.be.bignumber.equal('1000');
 
             // Balance of vesting contract is still zero
             expect(await this.token.balanceOf(this.vesting.address)).to.be.bignumber.equal('0');
 
-            await time.increaseTo(this.vestingRelease2.add(time.duration.seconds(1)));
-            await tokenLock.release();
+            // on the 15. day
+            await time.increaseTo(this.vestingRelease1.add(time.duration.days(15)));
 
+            expect(await vesting.vestedAmount(this.token.address) ).to.be.bignumber.equal('48');
+
+            await vesting.release(this.token.address);
             // Balance of vesting contract is now 1000
-            expect(await this.token.balanceOf(this.vesting.address)).to.be.bignumber.equal('1000');
+            expect(await this.token.balanceOf(this.vesting.address)).to.be.bignumber.equal('48');
 
             // Balance in timelock is now zero
-            expect(await this.token.balanceOf(this.timeLock1)).to.be.bignumber.equal('0');
+            expect(await this.token.balanceOf(this.timeLock1)).to.be.bignumber.equal('952');
+
+            // on the 31th day ...
+            await time.increaseTo(this.vestingRelease1.add(time.duration.days(31)));
+
+            expect(await vesting.vestedAmount(this.token.address) ).to.be.bignumber.equal('100');
+
+            // ... the full 10% are in total available after call of release()
+            await vesting.release(this.token.address);
+            expect(await this.token.balanceOf(this.vesting.address)).to.be.bignumber.equal('100');
+
+            // Balance in timelock is now 900
+            expect(await this.token.balanceOf(this.timeLock1)).to.be.bignumber.equal('900');
           })
 
           it('release token by another is also allowed and okay, because they go into the right account', async function() {
+            return;
             let timestampOfRequest = this.vestingStart1.add(time.duration.days(4));
-            const tokenLockAddress = await this.tokenSale.getTimeLock(timestampOfRequest);
+            const tokenLockAddress = await this.tokenSale.getTimeLockAddress(timestampOfRequest);
             const tokenLock = await TokenTimelock.at(tokenLockAddress);
 
             await this.tokenSale.withdrawVestedTokensByTimestamp( timestampOfRequest );

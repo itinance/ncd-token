@@ -7,7 +7,7 @@ import "openzeppelin-eth/contracts/math/SafeMath.sol";
 import "openzeppelin-eth/contracts/token/ERC20/TokenTimelock.sol";
 
 import "./NCDToken.sol";
-import "./TeamVesting.sol";
+import "./TokenVesting.sol";
 
 contract NCDTokenSale is Initializable, Ownable {
     using SafeMath for uint256;
@@ -16,20 +16,31 @@ contract NCDTokenSale is Initializable, Ownable {
     uint256 private _openingTime;
     uint256 private _closingTime;
 
+    uint256 private constant ONE_YEAR_IN_SECONDS = 86400 * 365;
+    uint256 private constant ONE_MONTH_PERIOD_IN_SECONDS = 86400 * 31; // 31 days for a ideal month
+
+    uint256 private constant RELEASE_RATE_PER_MONTH = 10;
+
     uint256 private _teamTokensTotal;
     uint256 private _teamTokensUnreleased;
     uint256 private _teamTokensReleased;
 
-    TokenTimelock[] private _timeLocks;
+    TokenVesting[] private _timeLocks;
     uint256[] private _vestingPeriodsStart;
 
     address private _teamVesting;
 
-    event VestingLockAdded(uint256 vestingPeriodStart, uint256 releaseTime);
+    event VestingLockAdded(uint256 indexed vestingPeriodStart, uint256 indexed releaseTime, address indexed timeLockAddress,
+        uint256 periodLength, uint256 periodRate);
+
     event TeamVestingAssigned(address teamVesting);
 
     event VestedTokensWithdrawed(uint256 indexed timestampOfRequest, address indexed timeLockAddress, uint256 vestingPeriodStart,
         uint256 releaseTime, uint256 amount);
+
+    event Log(string label, string data);
+    event LogU(string label, uint256 data);
+    event LogA(string label, address data);
 
     /**
      * @dev Reverts if not in crowdsale time range.
@@ -119,29 +130,28 @@ contract NCDTokenSale is Initializable, Ownable {
         _teamTokensTotal = _teamTokensTotal.add(tokenAmount);
         _teamTokensUnreleased = _teamTokensUnreleased.add(tokenAmount);
 
-        require(NCDToken(address(token())).mint(beneficiary, tokenAmount));
+        require(NCDToken(address(token())).mint(beneficiary, tokenAmount), "NCDTokenSale: Token could not be mindet");
     }
 
-    function addVestingLock(uint256 vestingPeriodStart, uint256 releaseTime) public {
-        require(vestingPeriodStart < releaseTime);
-        // TODO: check also for overlapping periods)
+    function addVestingLock(uint256 vestingPeriodStart) public {
+        TokenVesting vesting = new TokenVesting();
 
-        TokenTimelock timeLock = new TokenTimelock();
-        timeLock.initialize(_token, _teamVesting, releaseTime );
+        vesting.initialize(_teamVesting, vestingPeriodStart, ONE_YEAR_IN_SECONDS,
+            ONE_MONTH_PERIOD_IN_SECONDS, RELEASE_RATE_PER_MONTH, true, owner());
 
         _vestingPeriodsStart.push(vestingPeriodStart);
-        _timeLocks.push(timeLock);
+        _timeLocks.push(vesting);
 
-        emit VestingLockAdded(vestingPeriodStart, releaseTime);
+        emit VestingLockAdded(vestingPeriodStart, vesting.cliff(), address(vesting), vesting.periodLength(), vesting.periodRate());
     }
 
-    function findTokenTimelock(uint256 timestamp) public view returns (uint256, uint256, TokenTimelock) {
-        for(uint256 i = 0; i < _vestingPeriodsStart.length; i++) {
+    function findTokenTimelock(uint256 timestamp) public view returns (uint256, uint256, address) {
+        for(uint256 i = _vestingPeriodsStart.length-1; i >= 0; i--) {
             uint256 vestingPeriodStart = _vestingPeriodsStart[i];
             if(vestingPeriodStart <= timestamp) {
-                TokenTimelock timeLock = _timeLocks[i];
-                if(timeLock.releaseTime() >= timestamp) {
-                    return (vestingPeriodStart, timeLock.releaseTime(), timeLock);
+                TokenVesting vesting = _timeLocks[i];
+                if(vesting.start() <= timestamp && timestamp <= vesting.cliff()) {
+                    return (vestingPeriodStart, vesting.cliff(), address(vesting));
                 }
             }
         }
@@ -149,13 +159,13 @@ contract NCDTokenSale is Initializable, Ownable {
     }
 
     function getTimeLockAddress(uint256 timestamp) public view returns (address) {
-        (uint256 vestingPeriodStart, uint256 releaseTime, TokenTimelock timeLock) = findTokenTimelock(timestamp);
-        return address(timeLock);
+        (uint256 vestingPeriodStart, uint256 releaseTime, address vesting) = findTokenTimelock(timestamp);
+        return vesting;
     }
 
-    function getTimeLock(uint256 timestamp) public view returns (TokenTimelock) {
-        (uint256 vestingPeriodStart, uint256 releaseTime, TokenTimelock timeLock) = findTokenTimelock(timestamp);
-        return timeLock;
+    function getTimeLockDataByIndex(uint256 index) public view returns (address, address, uint256, uint256, uint256, uint256 ) {
+        TokenVesting vesting = _timeLocks[index];
+        return (address(vesting), vesting.beneficiary(), vesting.start(), vesting.cliff(), vesting.periodLength(), vesting.periodRate());
     }
 
     function withdrawVestedTokensByTimestamp(uint256 timestamp) public returns(uint256) {
@@ -166,9 +176,12 @@ contract NCDTokenSale is Initializable, Ownable {
 
         // find the appropriate TimeLock according to the  timestamp
 
-        (uint256 vestingPeriodStart, uint256 releaseTime, TokenTimelock timeLock) = findTokenTimelock(timestamp);
+        (uint256 vestingPeriodStart, uint256 releaseTime, address vesting) = findTokenTimelock(timestamp);
 
-        require(vestingPeriodStart <= timestamp, "Invalid _vestingPeriodStart was found");
+        require(vestingPeriodStart <= timestamp, "Invalid vestingPeriodStart was found");
+
+        emit LogU("Vesting Time", timestamp);
+        emit LogA("Vesting found", vesting);
 
         //require(timestamp <= timeLock.releaseTime(), "Invalid _vestingPeriodStart was found");
 
@@ -179,9 +192,9 @@ contract NCDTokenSale is Initializable, Ownable {
         _teamTokensReleased = _teamTokensReleased.add(amount);
 
         // mint these tokens into the timelock contract for its vesting period
-        require(NCDToken(address(token())).mint(address(timeLock), amount), "NCDTokenSale: tokens could not minted into timelock");
+        require(NCDToken(address(token())).mint(vesting, amount), "NCDTokenSale: tokens could not minted into timelock");
 
-        emit VestedTokensWithdrawed(timestamp, address(timeLock), vestingPeriodStart, releaseTime, amount);
+        emit VestedTokensWithdrawed(timestamp, vesting, vestingPeriodStart, releaseTime, amount);
 
         return amount;
     }
