@@ -198,27 +198,4 @@ contract TeamVesting is Initializable, Ownable {
         return (balance, balancePerMonth);
     }
 
-/*    function registerTeamToken(uint256 value) public {
-        // we iterate over all beneficiaries
-        for (uint256 i = 0; i < _beneficiaries.length; ++i) {
-            // asking for their address
-            address beneficiary = _beneficiaries[i];
-
-            // asking for their vesting amount according to their personal deal
-            uint256 vestedAmount = calcVestingAmount(beneficiary, value);
-
-            // calculates the current vesting period in terms of a ideal 31-days-month
-            uint256 currentMonth = calcCurrentVestingPeriod();
-
-            // registering the vested token on this "monthly" vesting period per beneficiary
-            _vestingBalances[beneficiary] = _vestingBalances[beneficiary].add(vestedAmount);
-
-            // registering the vested token on this "monthly" vesting period per beneficiary
-            _vestedBalances[currentMonth][beneficiary] = _vestedBalances[currentMonth][beneficiary].add(vestedAmount);
-
-            // fire event
-            emit TeamTokenRegistration(beneficiary, vestedAmount, currentMonth );
-        }
-    }
-*/
 }
