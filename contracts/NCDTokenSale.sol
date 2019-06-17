@@ -159,7 +159,7 @@ contract NCDTokenSale is Initializable, Ownable {
     }
 
     function getTimeLockAddress(uint256 timestamp) public view returns (address) {
-        (uint256 vestingPeriodStart, uint256 releaseTime, address vesting) = findTokenTimelock(timestamp);
+        (/*uint256 vestingPeriodStart*/, /*uint256 releaseTime*/, address vesting) = findTokenTimelock(timestamp);
         return vesting;
     }
 
