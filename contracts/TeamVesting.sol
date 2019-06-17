@@ -161,7 +161,7 @@ contract TeamVesting is Initializable, Ownable {
      */
     function releaseTokensForPeriodAndBeneficiary(address beneficiary, uint256 period) public {
         // asking for those token that could be released in current period
-        (uint256 balance, uint256[] memory balancePerMonth) = calcReleasableTokenForPeriod(beneficiary, period);
+        (uint256 balance,) = calcReleasableTokenForPeriod(beneficiary, period);
 
         // if no more tokens can be released right now, we won't throw or revert here
         // because this function shall be able to executed so often as the vesting people want it to do.
