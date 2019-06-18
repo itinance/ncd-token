@@ -30,7 +30,7 @@ contract("CrowdSale TeamToken tests", async ([_, owner, buyer, another, pauser1,
       this.periodRate = 10;
 
 
-    // define vesting periods with a length of 10 days
+    // define vesting periods with a length of 31 days
       this.vestingStart1 = this.openingTime;
       this.vestingRelease1 = this.vestingStart1.add(this.cliffDuration);
 
@@ -52,8 +52,6 @@ contract("CrowdSale TeamToken tests", async ([_, owner, buyer, another, pauser1,
 
       await this.tokenSale.assignTeamVesting(this.vesting.address, {from: owner});
     });
-
-
 
     it('is owned by Owner', async function() {
       expect(await this.tokenSale.owner()).to.equal(owner);
@@ -183,6 +181,38 @@ contract("CrowdSale TeamToken tests", async ([_, owner, buyer, another, pauser1,
               // while timelock for period 2 is still zero
               expect(await this.token.balanceOf(this.timeLock2)).to.be.bignumber.equal('0');
           })
+
+          it('Withdrawing twice will not double the team vesting tokens', async function() {
+            const timestampOfRequest = this.vestingStart2.sub(time.duration.seconds(1));
+
+            let tx = await this.tokenSale.withdrawVestedTokensByTimestamp( timestampOfRequest );
+            let logs = tx.logs;
+
+            expectEvent.inLogs(logs, 'VestedTokensWithdrawed', {
+              timestampOfRequest: timestampOfRequest,
+              timeLockAddress: this.timeLock1,
+              vestingPeriodStart: this.vestingStart1,
+              releaseTime: this.vestingRelease1,
+              amount: '1000'
+            });
+
+            tx = await this.tokenSale.withdrawVestedTokensByTimestamp( timestampOfRequest );
+            logs = tx.logs;
+
+            expectEvent.inLogs(logs, 'VestedTokensWithdrawed', {
+              timestampOfRequest: timestampOfRequest,
+              timeLockAddress: this.timeLock1,
+              vestingPeriodStart: this.vestingStart1,
+              releaseTime: this.vestingRelease1,
+              amount: '0'
+            });
+
+            // with a balance of 1000
+            expect(await this.token.balanceOf(this.timeLock1)).to.be.bignumber.equal('1000');
+
+            // while timelock for period 2 is still zero
+            expect(await this.token.balanceOf(this.timeLock2)).to.be.bignumber.equal('0');
+        })
 
           it('Release token into TeamVesting contract works in Period 2 when Period 1 was forgotten to release', async function() {
             // this test case covers the following scenario:
