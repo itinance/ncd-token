@@ -168,6 +168,10 @@ contract NCDTokenSale is Initializable, Ownable {
         return (address(vesting), vesting.beneficiary(), vesting.start(), vesting.cliff(), vesting.periodLength(), vesting.periodRate());
     }
 
+    function withdrawVestedTokens() public returns(uint256) {
+        return withdrawVestedTokensByTimestamp(block.timestamp);
+    }
+
     function withdrawVestedTokensByTimestamp(uint256 timestamp) public returns(uint256) {
     //    require(msg.sender == _teamVesting);
 
