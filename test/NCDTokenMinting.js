@@ -4,6 +4,7 @@ const should = require('chai').should();
 
 const NCDToken = artifacts.require('NCDToken');
 
+
 contract("NCDTokenMinting", async ([_, owner, ...otherAccounts]) => {
     let token;
 
