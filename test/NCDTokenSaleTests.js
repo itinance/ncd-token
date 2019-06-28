@@ -8,6 +8,7 @@ const NCDToken = artifacts.require('NCDToken');
 
 const NCDTokenSale = artifacts.require('NCDTokenSale');
 
+
 contract("CrowdSale tests", async ([_, owner, buyer, vesting, pauser1, pauser2,  ...otherAccounts]) => {
     let token, tokenSale,
         openingTime, closingTime, afterClosingTime;
