@@ -3,7 +3,6 @@ pragma solidity ^0.5.7;
 import "openzeppelin-eth/contracts/token/ERC20/ERC20Detailed.sol";
 import "openzeppelin-eth/contracts/token/ERC20/ERC20Mintable.sol";
 import "openzeppelin-eth/contracts/token/ERC20/ERC20Pausable.sol";
-import "openzeppelin-eth/contracts/ownership/Ownable.sol";
 
 contract NCDToken is ERC20Detailed, ERC20Mintable, ERC20Pausable {
 
@@ -26,7 +25,7 @@ contract NCDToken is ERC20Detailed, ERC20Mintable, ERC20Pausable {
     }
 
     function () external payable {
-        //revert();
+        revert('Sending Ether directly is not allowed.');
     }
 
     /**
