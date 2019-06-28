@@ -29,12 +29,13 @@ contract("TokenVesting", async ([_, owner, beneficiary, ...otherAccounts]) => {
             await this.vesting.initialize(beneficiary, this.start, this.cliffDuration, this.periodLength, this.periodRate, true, owner);
         });
 
-        it("can get state", async () => {
+        it("can get state", async function() {
             (await this.vesting.beneficiary()).should.be.equal(beneficiary);
             (await this.vesting.cliff()).should.be.bignumber.equal(this.start.add(this.cliffDuration));
             (await this.vesting.start()).should.be.bignumber.equal(this.start);
+
             (await this.vesting.periodLength()).should.be.bignumber.equal(this.periodLength);
-            (await this.vesting.periodRate()).should.be.bignumber.equal(this.periodRate);
+            (await this.vesting.periodRate()).should.be.bignumber.equal(this.periodRate.toString());
             (await this.vesting.revocable()).should.be.equal(true);
             (await this.vesting.owner()).should.be.equal(owner);
         });
