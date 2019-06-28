@@ -5,6 +5,7 @@ const { ZERO_ADDRESS } = constants;
 const NCDToken = artifacts.require('NCDToken');
 const NCDTokenSale = artifacts.require('NCDTokenSaleImpl');
 
+
 contract("CrowdSale tests basic", async ([_, owner, pauser1, pauser2,  ...otherAccounts]) => {
     let token,
         openingTime, closingTime, afterClosingTime;

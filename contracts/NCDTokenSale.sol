@@ -130,7 +130,7 @@ contract NCDTokenSale is Initializable, Ownable {
         _teamTokensTotal = _teamTokensTotal.add(tokenAmount);
         _teamTokensUnreleased = _teamTokensUnreleased.add(tokenAmount);
 
-        require(NCDToken(address(token())).mint(beneficiary, tokenAmount), "NCDTokenSale: Token could not be mindet");
+        require(NCDToken(address(token())).mint(beneficiary, tokenAmount), "NCDTokenSale: Token could not be mintet");
     }
 
     function addVestingLock(uint256 vestingPeriodStart) public {
@@ -173,8 +173,6 @@ contract NCDTokenSale is Initializable, Ownable {
     }
 
     function withdrawVestedTokensByTimestamp(uint256 timestamp) public returns(uint256) {
-    //    require(msg.sender == _teamVesting);
-
         // _teamTokensUnreleased represents our amount of token that can be released into TimeLockVesting
         uint256 amount = _teamTokensUnreleased;
 
@@ -183,9 +181,6 @@ contract NCDTokenSale is Initializable, Ownable {
         (uint256 vestingPeriodStart, uint256 releaseTime, address vesting) = findTokenTimelock(timestamp);
 
         require(vestingPeriodStart <= timestamp, "Invalid vestingPeriodStart was found");
-
-        emit LogU("Vesting Time", timestamp);
-        emit LogA("Vesting found", vesting);
 
         //require(timestamp <= timeLock.releaseTime(), "Invalid _vestingPeriodStart was found");
 

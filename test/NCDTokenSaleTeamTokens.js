@@ -11,7 +11,6 @@ const NCDToken = artifacts.require('NCDToken');
 const NCDTokenSale = artifacts.require('NCDTokenSale');
 
 
-
 contract("CrowdSale TeamToken tests", async ([_, owner, buyer, another, pauser1, pauser2, vestor1, vestor2, ...otherAccounts]) => {
 
     before(async function () {
