@@ -267,14 +267,21 @@ contract("CrowdSale TeamToken tests", async ([_, owner, buyer, another, pauser1,
             expect(await this.token.balanceOf(this.timeLock2)).to.be.bignumber.equal('1500');
           })
 
-          it('Minting token in period 1 and releasing in period 1 works as well minting more token later and release in same period', async function() {
+          it('reverts if somebody wants to withdraw vested tokens in the past in favor of releasing into an earlier timelock', async function() {
+            let timestampOfRequest = this.vestingStart1.add(time.duration.days(4));
+            await time.increaseTo(timestampOfRequest.add(time.duration.seconds(1)));
+            await shouldFail.reverting(this.tokenSale.withdrawVestedTokensByTimestamp( timestampOfRequest ));
+          })
+
+
+          it('Minting token in period 1 and releasing in period 1 works as well minting more token later and release in the then-current period (period 2)', async function() {
             // in this scenario we release on a day middle of vesting period 1 our team tokens
             // and will get 1000 token as expected
 
-            const timestampOfRequest = this.vestingStart1.add(time.duration.days(4));
+            let timestampOfRequest = this.vestingStart1.add(time.duration.days(4));
             let {logs} = await this.tokenSale.withdrawVestedTokensByTimestamp( timestampOfRequest );
 
-            // 1500 tokens are expected to get
+            // 1000 tokens are expected to get
             expectEvent.inLogs(logs, 'VestedTokensWithdrawed', {
               timestampOfRequest: timestampOfRequest,
               vestingPeriodStart: this.vestingStart1,
@@ -287,18 +294,21 @@ contract("CrowdSale TeamToken tests", async ([_, owner, buyer, another, pauser1,
             await this.tokenSale.mintTokens(another, 500, {from: owner});
 
             // add the end of the period we expect this tokens as well being released into team vesting contract
+            timestampOfRequest = this.vestingStart2.add(time.duration.seconds(1));
+            await time.increaseTo(timestampOfRequest);
             const tx = await this.tokenSale.withdrawVestedTokensByTimestamp( timestampOfRequest );
             logs = tx.logs;
 
             // 1500 tokens are expected to get
             expectEvent.inLogs(logs, 'VestedTokensWithdrawed', {
               timestampOfRequest: timestampOfRequest,
-              vestingPeriodStart: this.vestingStart1,
-              releaseTime: this.vestingRelease1,
+              vestingPeriodStart: this.vestingStart2,
+              releaseTime: this.vestingRelease2,
               amount: '500'
             });
 
-            expect(await this.token.balanceOf(this.timeLock1)).to.be.bignumber.equal('1500');
+            expect(await this.token.balanceOf(this.timeLock1)).to.be.bignumber.equal('1000');
+            expect(await this.token.balanceOf(this.timeLock2)).to.be.bignumber.equal('500');
           })
 
           it('Minting token in period 1 and releasing in period 1 works as well like minting in period 2 and releasing in period 2', async function() {
