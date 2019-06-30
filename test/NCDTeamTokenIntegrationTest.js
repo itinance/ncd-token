@@ -11,7 +11,6 @@ const NCDToken = artifacts.require('NCDToken');
 const NCDTokenSale = artifacts.require('NCDTokenSale');
 
 
-
 contract("TeamToken Integration tests", async ([_, owner, buyer, another, vesting, pauser1, pauser2, vestor1, vestor2, ...otherAccounts]) => {
 
     before(async function () {
@@ -78,7 +77,7 @@ contract("TeamToken Integration tests", async ([_, owner, buyer, another, vestin
         }
         this.vestingPeriods.push(vestingPeriod);
 
-        await this.tokenSale.addVestingLock(start);
+        await this.tokenSale.addVestingLock(start, {from: owner});
         this.timeLocks[i] = await this.tokenSale.getTimeLockAddress(start);
 
         start = start.add(this.periodLength);
@@ -131,7 +130,7 @@ contract("TeamToken Integration tests", async ([_, owner, buyer, another, vestin
             console.log("Date: " + date)
             await time.increaseTo(date);
             await time.advanceBlock();
-            await this.tokenSale.mintTokens(buyer, amount);
+            await this.tokenSale.mintTokens(buyer, amount, {from: owner});
 
             // move forward to end of the month
 
@@ -171,7 +170,7 @@ contract("TeamToken Integration tests", async ([_, owner, buyer, another, vestin
 
         context('one year later', function() {
           beforeEach(async function () {
-            await time.advanceBlock();
+              await time.advanceBlock();
           });
 
           it('we can release tokens monthly with 10% rate ', async function() {

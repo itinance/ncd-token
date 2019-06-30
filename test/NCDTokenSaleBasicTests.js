@@ -24,12 +24,6 @@ contract("CrowdSale tests basic", async ([_, owner, pauser1, pauser2,  ...otherA
         await token.initialize( owner, [pauser1, pauser2]);
     });
 
-    it('reverts if the opening time is in the past', async function () {
-      await shouldFail.reverting(NCDTokenSale.new(
-        owner, (await time.latest()).sub(time.duration.days(1)), closingTime, token.address
-      ));
-    });
-
     it('reverts if the closing time is before the opening time', async function () {
       await shouldFail.reverting(NCDTokenSale.new(
         owner, openingTime, openingTime.sub(time.duration.seconds(1)), token.address
