@@ -148,7 +148,7 @@ contract NCDTokenSale is Initializable, ReentrancyGuard, Ownable, MinterRole {
 
         TokenVesting vesting = new TokenVesting();
         vesting.initialize(_teamVesting, vestingPeriodStart, ONE_YEAR_IN_SECONDS,
-            ONE_MONTH_PERIOD_IN_SECONDS, RELEASE_RATE_PER_MONTH, true, owner());
+            ONE_MONTH_PERIOD_IN_SECONDS, RELEASE_RATE_PER_MONTH, owner());
 
         _vestingPeriodsStart.push(vestingPeriodStart);
         _timeLocks.push(vesting);

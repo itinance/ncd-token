@@ -157,13 +157,13 @@ contract("TeamToken Integration tests", async ([_, owner, buyer, another, vestin
           expect(saldo).to.equal(2110);
         });
 
-        /*it('has minted all tokens', async function() {
+        it('has minted all tokens', async function() {
           expect(await this.token.balanceOf(buyer)).to.be.bignumber.equal('2110');
         })
 
         it('has registered all team tokens', async function() {
           expect(await this.tokenSale.getTeamTokensTotal()).to.be.bignumber.equal('2110');
-        })*/
+        })
 
 
         context('one year later', function() {
