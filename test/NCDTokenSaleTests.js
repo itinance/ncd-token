@@ -35,14 +35,15 @@ contract("CrowdSale tests", async ([_, owner, buyer, vesting, pauser1, pauser2, 
       token = await NCDToken.new({from: owner});
       await token.initialize( owner, [pauser1, pauser2]);
 
-      openingTime = await time.latest();
+      openingTime = (await time.latest()).add(time.duration.weeks(1));
       closingTime = openingTime.add(time.duration.years(1));
       afterClosingTime = closingTime.add(time.duration.seconds(1));
 
       tokenSale = await NCDTokenSale.new({from: owner});
       await tokenSale.initialize(owner, openingTime, closingTime, token.address);
 
-      await time.increaseTo(this.afterClosingTime);
+      console.log("TIME ->: " + afterClosingTime.toString())
+      await time.increaseTo(afterClosingTime);
       await time.advanceBlock();
 
       await token.addMinter(tokenSale.address, {from: owner});
