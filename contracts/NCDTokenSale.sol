@@ -4,13 +4,12 @@ import "zos-lib/contracts/Initializable.sol";
 import "openzeppelin-eth/contracts/ownership/Ownable.sol";
 import "openzeppelin-eth/contracts/math/SafeMath.sol";
 import "openzeppelin-eth/contracts/token/ERC20/TokenTimelock.sol";
-import "openzeppelin-eth/contracts/utils/ReentrancyGuard.sol";
 import "openzeppelin-eth/contracts/access/roles/MinterRole.sol";
 
 import "./NCDToken.sol";
 import "./TokenVesting.sol";
 
-contract NCDTokenSale is Initializable, ReentrancyGuard, Ownable, MinterRole {
+contract NCDTokenSale is Initializable, Ownable, MinterRole {
     using SafeMath for uint256;
 
     NCDToken private _token;
@@ -112,10 +111,10 @@ contract NCDTokenSale is Initializable, ReentrancyGuard, Ownable, MinterRole {
     }
 
     /**
-     * @dev Assigns TimeVesting contract. Vesting rules are declared at whitepaper (https://nuco.cloud)
+     * @dev Assigns final team vesting address, that is used by TokenVesting contract as target beneficiary. Vesting rules are declared at whitepaper (https://nuco.cloud)
      */
     function assignTeamVesting(address teamVesting) public onlyOwner {
-        require(teamVesting != address(0));
+        require(teamVesting != address(0), "NCDTokenSale: no Zero address allowed as team vesting contract");
 
         _teamVesting = teamVesting;
         emit TeamVestingAssigned(_teamVesting);
@@ -133,7 +132,7 @@ contract NCDTokenSale is Initializable, ReentrancyGuard, Ownable, MinterRole {
      * @param beneficiary Token purchaser
      * @param tokenAmount Number of tokens to be minted
      */
-    function mintTokens(address beneficiary, uint256 tokenAmount) public nonReentrant onlyMinter onlyWhileOpen {
+    function mintTokens(address beneficiary, uint256 tokenAmount) public onlyMinter onlyWhileOpen {
         _teamTokensTotal = _teamTokensTotal.add(tokenAmount);
         _teamTokensUnreleased = _teamTokensUnreleased.add(tokenAmount);
 
@@ -156,6 +155,9 @@ contract NCDTokenSale is Initializable, ReentrancyGuard, Ownable, MinterRole {
         emit VestingLockAdded(vestingPeriodStart, vesting.cliff(), address(vesting), vesting.periodLength(), vesting.periodRate());
     }
 
+    /**
+     * @dev find the proper timelock for a specific timestamp
+     */
     function findTokenTimelock(uint256 timestamp) public view returns (uint256, uint256, address) {
         for(uint256 i = _vestingPeriodsStart.length-1; i >= 0; i--) {
             uint256 vestingPeriodStart = _vestingPeriodsStart[i];
@@ -179,15 +181,21 @@ contract NCDTokenSale is Initializable, ReentrancyGuard, Ownable, MinterRole {
         return (address(vesting), vesting.beneficiary(), vesting.start(), vesting.cliff(), vesting.periodLength(), vesting.periodRate());
     }
 
+    /**
+     * @dev mints and withdrawals team related token into the token vesting contract according for current timestamp within ICO
+     * @dev it is meant to execute this function at the end of every monthly period
+     */
     function withdrawVestedTokens() public returns(uint256) {
         return withdrawVestedTokensByTimestamp(block.timestamp);
     }
 
+    /**
+     * @dev mints and withdrawals team related token into the token vesting contract according to a specific timestamp within ICO
+     */
     function withdrawVestedTokensByTimestamp(uint256 timestamp) public returns(uint256) {
-        // _teamTokensUnreleased represents our amount of token that can be released into TimeLockVesting
-
         require(timestamp >= block.timestamp, "withdraw Vesting Token in the past not allowed");
 
+        // _teamTokensUnreleased represents our amount of token that can be released into TimeLockVesting
         uint256 amount = _teamTokensUnreleased;
 
         // find the appropriate TimeLock according to the  timestamp
@@ -211,6 +219,5 @@ contract NCDTokenSale is Initializable, ReentrancyGuard, Ownable, MinterRole {
 
         return amount;
     }
-
 
 }
