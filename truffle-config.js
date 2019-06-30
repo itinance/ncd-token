@@ -4,14 +4,6 @@ require('dotenv').config();
 const HDWalletProvider = require("truffle-hdwallet-provider");
 const infuraProjectId = process.env.INFURA_API_KEY;
 
-const x = new HDWalletProvider(
-  process.env.DEV_MNEMONIC, "https://ropsten.infura.io/v3/" + infuraProjectId, 0, 1,
-  true, "m/44'/1'/0'/0/"
-  )
-
-console.log(x.getAddresses())
-
-
 module.exports = {
   // See <http://truffleframework.com/docs/advanced/configuration>
   // to customize your Truffle configuration!

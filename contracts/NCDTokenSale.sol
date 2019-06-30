@@ -204,8 +204,6 @@ contract NCDTokenSale is Initializable, Ownable, MinterRole {
 
         require(vestingPeriodStart <= timestamp, "Invalid vestingPeriodStart was found");
 
-        //require(timestamp <= timeLock.releaseTime(), "Invalid _vestingPeriodStart was found");
-
         // reset unreleased tokens
         _teamTokensUnreleased = 0;
 
