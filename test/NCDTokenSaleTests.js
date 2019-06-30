@@ -31,6 +31,24 @@ contract("CrowdSale tests", async ([_, owner, buyer, vesting, pauser1, pauser2, 
       await shouldFail.reverting(tokenSale.assignTeamVesting(vesting, {from: buyer}));
     })
 
+    it('reverts if token shall get minted after crowdsale has already finished', async function() {
+      token = await NCDToken.new({from: owner});
+      await token.initialize( owner, [pauser1, pauser2]);
+
+      openingTime = await time.latest();
+      closingTime = openingTime.add(time.duration.years(1));
+      afterClosingTime = closingTime.add(time.duration.seconds(1));
+
+      tokenSale = await NCDTokenSale.new({from: owner});
+      await tokenSale.initialize(owner, openingTime, closingTime, token.address);
+
+      await time.increaseTo(this.afterClosingTime);
+      await time.advanceBlock();
+
+      await token.addMinter(tokenSale.address, {from: owner});
+      await shouldFail.reverting( tokenSale.mintTokens(buyer, 1000, {from: owner}) );
+    })
+
     context('once token was bought', function () {
 
       beforeEach(async function () {
@@ -108,7 +126,7 @@ contract("CrowdSale tests", async ([_, owner, buyer, vesting, pauser1, pauser2, 
         expect(balance).to.be.bignumber.equal('1000');
     });
 
-      it('token can be minted in the crowdsale by owner', async function() {
+    it('token can be minted in the crowdsale by owner', async function() {
           // minting 1000 tokens
           await tokenSale.mintTokens(buyer, 1000, {from: owner});
 
