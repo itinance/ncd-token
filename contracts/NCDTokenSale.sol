@@ -121,6 +121,9 @@ contract NCDTokenSale is Initializable, ReentrancyGuard, Ownable, MinterRole {
         emit TeamVestingAssigned(_teamVesting);
     }
 
+    /**
+     * @dev Don't accept any Ether
+     */
     function () external payable {
         revert('Payment in ETH not allowed');
     }
@@ -137,9 +140,13 @@ contract NCDTokenSale is Initializable, ReentrancyGuard, Ownable, MinterRole {
         require(NCDToken(address(token())).mint(beneficiary, tokenAmount), "NCDTokenSale: Token could not be mintet");
     }
 
+    /**
+     * @dev Add vesting lock contract for vested team tokens according to the Whitepaper (https://nuco.cloud)
+     */
     function addVestingLock(uint256 vestingPeriodStart) public onlyOwner {
-        TokenVesting vesting = new TokenVesting();
+        require(_teamVesting != address(0));
 
+        TokenVesting vesting = new TokenVesting();
         vesting.initialize(_teamVesting, vestingPeriodStart, ONE_YEAR_IN_SECONDS,
             ONE_MONTH_PERIOD_IN_SECONDS, RELEASE_RATE_PER_MONTH, true, owner());
 
@@ -178,6 +185,9 @@ contract NCDTokenSale is Initializable, ReentrancyGuard, Ownable, MinterRole {
 
     function withdrawVestedTokensByTimestamp(uint256 timestamp) public returns(uint256) {
         // _teamTokensUnreleased represents our amount of token that can be released into TimeLockVesting
+
+        require(timestamp >= block.timestamp, "withdraw Vesting Token in the past not allowed");
+
         uint256 amount = _teamTokensUnreleased;
 
         // find the appropriate TimeLock according to the  timestamp
