@@ -23,7 +23,6 @@ contract TokenVesting is Initializable, Ownable {
     using SafeERC20 for IERC20;
 
     event TokensReleased(address token, uint256 amount);
-    event TokenVestingRevoked(address token);
 
     // beneficiary of tokens after they are released
     address private _beneficiary;
@@ -36,8 +35,6 @@ contract TokenVesting is Initializable, Ownable {
     uint256 private _periodLength;
     uint256 private _periodRate;
 
-    bool private _revocable;
-
     mapping (address => uint256) private _released;
     mapping (address => bool) private _revoked;
 
@@ -48,10 +45,10 @@ contract TokenVesting is Initializable, Ownable {
      * @param beneficiary address of the beneficiary to whom vested tokens are transferred
      * @param cliffDuration duration in seconds of the cliff in which tokens will begin to vest
      * @param start the time (as Unix time) at which point vesting starts
-     * @param revocable whether the vesting is revocable or not
+     * @param owner The owner
      */
-    function initialize(address beneficiary, uint256 start, uint256 cliffDuration, uint256 periodLength, uint256 periodRate, bool revocable, address sender) public initializer {
-        Ownable.initialize(sender);
+    function initialize(address beneficiary, uint256 start, uint256 cliffDuration, uint256 periodLength, uint256 periodRate, address owner) public initializer {
+        Ownable.initialize(owner);
 
         require(beneficiary != address(0), "TokenVesting: beneficiary is zero address");
         require(cliffDuration > 0, "TokenVesting: cliff must be > 0" );
@@ -60,7 +57,6 @@ contract TokenVesting is Initializable, Ownable {
         require(start.add(cliffDuration) > block.timestamp, "TokenVesting: end of cliff period must be in future");
 
         _beneficiary = beneficiary;
-        _revocable = revocable;
         _periodLength = periodLength;
         _periodRate = periodRate;
 
@@ -98,24 +94,10 @@ contract TokenVesting is Initializable, Ownable {
     }
 
     /**
-     * @return true if the vesting is revocable.
-     */
-    function revocable() public view returns (bool) {
-        return _revocable;
-    }
-
-    /**
      * @return the amount of the token released.
      */
     function released(address token) public view returns (uint256) {
         return _released[token];
-    }
-
-    /**
-     * @return true if the token is revoked.
-     */
-    function revoked(address token) public view returns (bool) {
-        return _revoked[token];
     }
 
     /**
@@ -132,27 +114,6 @@ contract TokenVesting is Initializable, Ownable {
         token.safeTransfer(_beneficiary, unreleased);
 
         emit TokensReleased(address(token), unreleased);
-    }
-
-    /**
-     * @notice Allows the owner to revoke the vesting. Tokens already vested
-     * remain in the contract, the rest are returned to the owner.
-     * @param token ERC20 token which is being vested
-     */
-    function revoke(IERC20 token) public onlyOwner {
-        require(_revocable);
-        require(!_revoked[address(token)]);
-
-        uint256 balance = token.balanceOf(address(this));
-
-        uint256 unreleased = _releasableAmount(token);
-        uint256 refund = balance.sub(unreleased);
-
-        _revoked[address(token)] = true;
-
-        token.safeTransfer(owner(), refund);
-
-        emit TokenVestingRevoked(address(token));
     }
 
     /**
@@ -178,18 +139,10 @@ contract TokenVesting is Initializable, Ownable {
         }
 
         uint256 _totalBalance = totalBalance(token);
-
         uint256 secondsSinceCliff = block.timestamp.sub(_cliff);
 
-
         uint256 percentInPeriod = secondsSinceCliff.mul(10**MATH_PRECISION).div(_periodLength).div(_periodRate);
-
         return _totalBalance.mul(percentInPeriod).div(10**MATH_PRECISION);
-
-
-        //return block.timestamp.sub(_cliff).div(_periodLength).div(_periodRate);
-
-//        return totalBalance.div(_periodRate);
     }
 
     uint256[50] private ______gap;

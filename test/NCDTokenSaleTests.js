@@ -8,7 +8,6 @@ const NCDToken = artifacts.require('NCDToken');
 
 const NCDTokenSale = artifacts.require('NCDTokenSale');
 
-
 contract("CrowdSale tests", async ([_, owner, buyer, vesting, pauser1, pauser2, anotherMinter, ...otherAccounts]) => {
     let token, tokenSale,
         openingTime, closingTime, afterClosingTime;
@@ -42,7 +41,6 @@ contract("CrowdSale tests", async ([_, owner, buyer, vesting, pauser1, pauser2, 
       tokenSale = await NCDTokenSale.new({from: owner});
       await tokenSale.initialize(owner, openingTime, closingTime, token.address);
 
-      console.log("TIME ->: " + afterClosingTime.toString())
       await time.increaseTo(afterClosingTime);
       await time.advanceBlock();
 
