@@ -127,14 +127,12 @@ contract("TeamToken Integration tests", async ([_, owner, buyer, another, vestin
             // move forward to beginning of month
             const date = this.vestingPeriods[month].start;
 
-            console.log("Date: " + date)
             await time.increaseTo(date);
             await time.advanceBlock();
             await this.tokenSale.mintTokens(buyer, amount, {from: owner});
 
             // move forward to end of the month
 
-            console.log("Date 2: " + date.add(time.duration.days(4)));
             await time.increaseTo(date.add(time.duration.days(4)));
 
             // and withdraw vested tokens
