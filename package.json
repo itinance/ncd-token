@@ -25,16 +25,20 @@
   },
   "homepage": "https://github.com/rrecuero/zepkit#readme",
   "dependencies": {
-    "dotenv": "^8.0.0",
     "openzeppelin-eth": "^2.1.3",
     "solidity-coverage": "^0.5.11",
-    "truffle-hdwallet-provider": "^1.0.10",
+    "zos": "^2.4.0",
     "zos-lib": "^2.3.1"
   },
   "devDependencies": {
     "chai": "^4.2.0",
+    "diff": ">=3.5.0",
+    "dotenv": "^8.0.0",
+    "eth-gas-reporter": "^0.2.1",
     "openzeppelin-test-helpers": "^0.3.2",
     "truffle-assertions": "^0.9.1",
-    "diff": ">=3.5.0"
+    "truffle-flattener": "^1.4.0",
+    "truffle-hdwallet-provider": "^1.0.12",
+    "zos-truffle-merge": "0.0.5"
   }
 }
