@@ -3,13 +3,14 @@ pragma solidity ^0.5.7;
 import "zos-lib/contracts/Initializable.sol";
 import "openzeppelin-eth/contracts/ownership/Ownable.sol";
 import "openzeppelin-eth/contracts/math/SafeMath.sol";
-
 import "openzeppelin-eth/contracts/token/ERC20/TokenTimelock.sol";
+import "openzeppelin-eth/contracts/utils/ReentrancyGuard.sol";
+import "openzeppelin-eth/contracts/access/roles/MinterRole.sol";
 
 import "./NCDToken.sol";
 import "./TokenVesting.sol";
 
-contract NCDTokenSale is Initializable, Ownable {
+contract NCDTokenSale is Initializable, ReentrancyGuard, Ownable, MinterRole {
     using SafeMath for uint256;
 
     NCDToken private _token;
@@ -50,17 +51,17 @@ contract NCDTokenSale is Initializable, Ownable {
         _;
     }
 
-
     function initialize(address owner, uint256 openingTime, uint256 closingTime, NCDToken token) public initializer {
         require(address(token) != address(0), "NCDTokenSale: Zero-Address for token is invalid");
         require(owner != address(0), "NCDTokenSale: address of Owner is invalid");
+        require(closingTime > openingTime, "NCDTokenSale: opening time is not before closing time");
 
         Ownable.initialize(owner);
-        _token = token;
 
-        // solhint-disable-next-line not-rely-on-time
-        require(openingTime >= block.timestamp - 1, "NCDTokenSale: opening time is before current time");
-        require(closingTime > openingTime, "NCDTokenSale: opening time is not before closing time");
+        // makes owner the very first Minter
+        MinterRole.initialize(owner);
+
+        _token = token;
 
         _openingTime = openingTime;
         _closingTime = closingTime;
@@ -110,7 +111,10 @@ contract NCDTokenSale is Initializable, Ownable {
         return block.timestamp > _closingTime;
     }
 
-    function assignTeamVesting(address teamVesting) public  {
+    /**
+     * @dev Assigns TimeVesting contract. Vesting rules are declared at whitepaper (https://nuco.cloud)
+     */
+    function assignTeamVesting(address teamVesting) public onlyOwner {
         require(teamVesting != address(0));
 
         _teamVesting = teamVesting;
@@ -126,14 +130,14 @@ contract NCDTokenSale is Initializable, Ownable {
      * @param beneficiary Token purchaser
      * @param tokenAmount Number of tokens to be minted
      */
-    function mintTokens(address beneficiary, uint256 tokenAmount) public onlyWhileOpen {
+    function mintTokens(address beneficiary, uint256 tokenAmount) public nonReentrant onlyMinter onlyWhileOpen {
         _teamTokensTotal = _teamTokensTotal.add(tokenAmount);
         _teamTokensUnreleased = _teamTokensUnreleased.add(tokenAmount);
 
         require(NCDToken(address(token())).mint(beneficiary, tokenAmount), "NCDTokenSale: Token could not be mintet");
     }
 
-    function addVestingLock(uint256 vestingPeriodStart) public {
+    function addVestingLock(uint256 vestingPeriodStart) public onlyOwner {
         TokenVesting vesting = new TokenVesting();
 
         vesting.initialize(_teamVesting, vestingPeriodStart, ONE_YEAR_IN_SECONDS,

@@ -18,6 +18,8 @@ contract("CrowdSale TeamToken tests", async ([_, owner, buyer, another, pauser1,
       await time.advanceBlock();
     });
 
+
+
     beforeEach(async function () {
       // Define time range of the crows sale
       this.openingTime = (await time.latest()).add(time.duration.weeks(1));
@@ -56,11 +58,17 @@ contract("CrowdSale TeamToken tests", async ([_, owner, buyer, another, pauser1,
       expect(await this.tokenSale.owner()).to.equal(owner);
     })
 
+    it('reverts if a non-owner tries to add a vesting lock ', async function() {
+      await shouldFail.reverting(
+        this.tokenSale.addVestingLock(this.vestingStart1)
+      );
+    })
+
     context('once deployed', function () {
         beforeEach(async function () {
           // Prepare vesting Locks
-          await this.tokenSale.addVestingLock(this.vestingStart1);
-          await this.tokenSale.addVestingLock(this.vestingStart2);
+          await this.tokenSale.addVestingLock(this.vestingStart1, {from: owner});
+          await this.tokenSale.addVestingLock(this.vestingStart2, {from: owner});
 
           await time.increaseTo(this.openingTime);
           await time.advanceBlock();
@@ -69,7 +77,7 @@ contract("CrowdSale TeamToken tests", async ([_, owner, buyer, another, pauser1,
           this.timeLock2 = await this.tokenSale.getTimeLockAddress(this.vestingStart2);
 
           // minting 1000 tokens
-          await this.tokenSale.mintTokens(buyer, 1000);
+          await this.tokenSale.mintTokens(buyer, 1000, {from: owner});
         });
 
         it('time locks of different vesting periods have different addresses', async function() {
@@ -137,7 +145,7 @@ contract("CrowdSale TeamToken tests", async ([_, owner, buyer, another, pauser1,
               expect(await this.tokenSale.getTeamTokensReleased()).to.be.bignumber.equal('0');
 
               // minting 1000 tokens
-              await this.tokenSale.mintTokens(another, 500);
+              await this.tokenSale.mintTokens(another, 500, {from: owner});
 
               balance = await this.token.balanceOf(another);
               expect(balance).to.be.bignumber.equal('500');
@@ -242,7 +250,7 @@ contract("CrowdSale TeamToken tests", async ([_, owner, buyer, another, pauser1,
 
             // minting further 500 tokens
             await time.increaseTo(this.vestingStart2.add(time.duration.seconds(1)));
-            await this.tokenSale.mintTokens(another, 500);
+            await this.tokenSale.mintTokens(another, 500, {from: owner});
 
             const timestampOfRequest = this.vestingRelease2.sub(time.duration.seconds(1));
             const {logs} = await this.tokenSale.withdrawVestedTokensByTimestamp( timestampOfRequest );
@@ -276,7 +284,7 @@ contract("CrowdSale TeamToken tests", async ([_, owner, buyer, another, pauser1,
 
             // one day later, further 500 tokens was sold and minted
             await time.increaseTo(this.vestingStart1.add(time.duration.days(5)));
-            await this.tokenSale.mintTokens(another, 500);
+            await this.tokenSale.mintTokens(another, 500, {from: owner});
 
             // add the end of the period we expect this tokens as well being released into team vesting contract
             const tx = await this.tokenSale.withdrawVestedTokensByTimestamp( timestampOfRequest );
@@ -310,7 +318,7 @@ contract("CrowdSale TeamToken tests", async ([_, owner, buyer, another, pauser1,
 
             // one day later, further 500 tokens was sold and minted
             await time.increaseTo(this.vestingStart2.add(time.duration.days(5)));
-            await this.tokenSale.mintTokens(another, 500);
+            await this.tokenSale.mintTokens(another, 500, {from: owner});
 
             // add the end of the period we expect this tokens as well being released into team vesting contract
             timestampOfRequest = this.vestingRelease2.sub(time.duration.seconds(1));
