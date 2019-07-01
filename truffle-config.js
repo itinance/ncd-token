@@ -48,11 +48,11 @@ module.exports = {
     }
   },
   mocha: {
-/*    reporter: 'eth-gas-reporter',
+    reporter: 'eth-gas-reporter',
     reporterOptions : {
       currency: 'EUR',
       gasPrice: 21
-    }*/
+    }
   },
   solc: {
     optimizer: {
