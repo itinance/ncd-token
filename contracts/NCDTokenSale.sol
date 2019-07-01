@@ -29,8 +29,6 @@ contract NCDTokenSale is Initializable, Ownable, MinterRole {
     TokenVesting[] private _timeLocks;
     uint256[] private _vestingPeriodsStart;
 
-    address private _teamVesting;
-
     event VestingLockAdded(uint256 indexed vestingPeriodStart, uint256 indexed releaseTime, address indexed timeLockAddress,
         uint256 periodLength, uint256 periodRate);
 
@@ -61,10 +59,6 @@ contract NCDTokenSale is Initializable, Ownable, MinterRole {
 
         _openingTime = openingTime;
         _closingTime = closingTime;
-    }
-
-    function teamVesting() public view returns (address) {
-        return _teamVesting;
     }
 
     function getTeamTokensTotal() public view returns (uint256) {
@@ -112,24 +106,6 @@ contract NCDTokenSale is Initializable, Ownable, MinterRole {
     }
 
     /**
-     * @dev Assigns final team vesting address, that is used by TokenVesting contract as target beneficiary. Vesting rules are declared at whitepaper (https://nuco.cloud)
-     */
-    function assignTeamVesting(address teamVesting) public onlyOwner {
-        require(teamVesting != address(0), "NCDTokenSale: no Zero address allowed as team vesting address");
-
-        _teamVesting = teamVesting;
-        emit TeamVestingAssigned(_teamVesting);
-
-        // update time locks/token vesting contracts as well
-        if(_timeLocks.length > 0) {
-            for(uint256 i = 0; i < _timeLocks.length; i++) {
-                TokenVesting vesting = _timeLocks[i];
-                vesting.updateBeneficiary(teamVesting);
-            }
-        }
-    }
-
-    /**
      * @dev Don't accept any Ether
      */
     function () external payable {
@@ -152,14 +128,8 @@ contract NCDTokenSale is Initializable, Ownable, MinterRole {
      * @dev Add vesting lock contract for vested team tokens according to the Whitepaper (https://nuco.cloud)
      */
     function addVestingLock(uint256 vestingPeriodStart, TokenVesting vesting) public onlyOwner {
-        require(_teamVesting != address(0));
         require(address(vesting) != address(0));
 
-/*
-        TokenVesting vesting = new TokenVesting();
-        vesting.initialize(_teamVesting, vestingPeriodStart, ONE_YEAR_IN_SECONDS,
-            ONE_MONTH_PERIOD_IN_SECONDS, RELEASE_RATE_PER_MONTH, owner(), address(this));
-*/
         _vestingPeriodsStart.push(vestingPeriodStart);
         _timeLocks.push(vesting);
 
@@ -209,11 +179,13 @@ contract NCDTokenSale is Initializable, Ownable, MinterRole {
         // _teamTokensUnreleased represents our amount of token that can be released into TimeLockVesting
         uint256 amount = _teamTokensUnreleased;
 
-        // find the appropriate TimeLock according to the  timestamp
+        require(amount > 0, "NCDTokenSale: no tokens available yet");
 
+        // find the appropriate TimeLock according to the  timestamp
         (uint256 vestingPeriodStart, uint256 releaseTime, address vesting) = findTokenTimelock(timestamp);
 
-        require(vestingPeriodStart <= timestamp, "Invalid vestingPeriodStart was found");
+        require(vesting != address(0), "NCDTokenSale: vesting-address is required");
+        require(vestingPeriodStart <= timestamp, "NCDTokenSale: Invalid vestingPeriodStart was found");
 
         // reset unreleased tokens
         _teamTokensUnreleased = 0;

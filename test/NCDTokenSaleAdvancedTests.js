@@ -24,16 +24,6 @@ contract("CrowdSale tests", async ([_, owner, buyer, vesting, pauser1, pauser2, 
       await token.initialize( owner, [pauser1, pauser2]);
     });
 
-    it('can not deploy teamVesting by Non-Owner', async function() {
-      tokenSale = await NCDTokenSale.new({from: owner});
-      openingTime = await time.latest();
-      closingTime = openingTime.add(time.duration.years(1));
-
-      await tokenSale.initialize(owner, openingTime, closingTime, token.address);
-
-      await shouldFail.reverting(tokenSale.assignTeamVesting(vesting, {from: buyer}));
-    })
-
     it('reverts if token shall get minted after crowdsale has already finished', async function() {
       token = await NCDToken.new({from: owner});
       await token.initialize( owner, [pauser1, pauser2]);
@@ -65,8 +55,6 @@ contract("CrowdSale tests", async ([_, owner, buyer, vesting, pauser1, pauser2, 
           tokenSale = await NCDTokenSale.new({from: owner});
           await tokenSale.initialize(owner, openingTime, closingTime, token.address);
 
-          await tokenSale.assignTeamVesting(vesting, {from: owner});
-
           await token.addMinter(tokenSale.address, {from: owner});
           await token.renounceMinter({ from: owner });
 
@@ -94,7 +82,7 @@ contract("CrowdSale tests", async ([_, owner, buyer, vesting, pauser1, pauser2, 
           vestingRelease2 = vestingStart2.add(time.duration.days(31*12))
           ;
 
-        const tokenVesting = await TokenVesting.new(vesting, vestingStart1, ONE_YEAR_IN_SECONDS, ONE_MONTH_PERIOD_IN_SECONDS, RELEASE_RATE_PER_MONTH, owner, ZERO_ADDRESS);
+        const tokenVesting = await TokenVesting.new(vesting, vestingStart1, ONE_YEAR_IN_SECONDS, ONE_MONTH_PERIOD_IN_SECONDS, RELEASE_RATE_PER_MONTH, owner);
         let {logs} = await tokenSale.addVestingLock(vestingStart1, tokenVesting.address, {from: owner});
 
         expectEvent.inLogs(logs, 'VestingLockAdded', {
@@ -102,7 +90,7 @@ contract("CrowdSale tests", async ([_, owner, buyer, vesting, pauser1, pauser2, 
           releaseTime: vestingRelease1,
         });
 
-        const tokenVesting2 = await TokenVesting.new(vesting, vestingStart2, ONE_YEAR_IN_SECONDS, ONE_MONTH_PERIOD_IN_SECONDS, RELEASE_RATE_PER_MONTH, owner, ZERO_ADDRESS);
+        const tokenVesting2 = await TokenVesting.new(vesting, vestingStart2, ONE_YEAR_IN_SECONDS, ONE_MONTH_PERIOD_IN_SECONDS, RELEASE_RATE_PER_MONTH, owner);
         const tx = await tokenSale.addVestingLock(vestingStart2, tokenVesting2.address, {from: owner});
 
         logs = tx.logs;
