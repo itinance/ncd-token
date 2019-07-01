@@ -3,7 +3,7 @@ const { BN, constants, expectEvent, shouldFail } = require('openzeppelin-test-he
 const should = require('chai').should();
 const { expect } = require('chai');
 
-const NCDToken = artifacts.require('NCDToken');
+const NCDToken = artifacts.require('NCDTokenImpl');
 
 contract("NCDToken", async ([_, owner, minter, pauser1, pauser2, ...otherAccounts]) => {
     let token;
@@ -13,8 +13,7 @@ contract("NCDToken", async ([_, owner, minter, pauser1, pauser2, ...otherAccount
     const notAPauser = otherAccounts[1];
 
     beforeEach(async function () {
-        token = await NCDToken.new({from: owner});
-        await token.initialize( minter, [pauser1, pauser2]);
+        token = await NCDToken.new(minter, [pauser1, pauser2], {from: owner});
     });
 
     it("it can be paused by Pauser 1", async () => {

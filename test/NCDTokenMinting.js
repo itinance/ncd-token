@@ -2,7 +2,7 @@ const truffleAssert = require('truffle-assertions');
 const { BN, constants, expectEvent, shouldFail } = require('openzeppelin-test-helpers');
 const should = require('chai').should();
 
-const NCDToken = artifacts.require('NCDToken');
+const NCDToken = artifacts.require('NCDTokenImpl');
 
 
 contract("NCDTokenMinting", async ([_, owner, ...otherAccounts]) => {
@@ -21,8 +21,7 @@ contract("NCDTokenMinting", async ([_, owner, ...otherAccounts]) => {
     const beneficiary = otherAccounts[4];
 
     beforeEach(async function () {
-        token = await NCDToken.new({from: owner});
-        await token.initialize( minter1, [pauser1, pauser2]);
+        token = await NCDToken.new(minter1, [pauser1, pauser2], {from: owner});
     });
 
     it("minting works generally", async () => {
