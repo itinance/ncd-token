@@ -4,13 +4,14 @@ const should = require('chai').should();
 const { expect } = require('chai');
 const { ZERO_ADDRESS } = constants;
 
-const TokenTimelock = artifacts.require("TokenTimelock");
-const TeamVesting = artifacts.require("TeamVesting");
-const TokenVesting = artifacts.require("TokenVesting");
+const TokenVesting = artifacts.require("TokenVestingImpl");
 const NCDToken = artifacts.require('NCDToken');
 const NCDTokenSale = artifacts.require('NCDTokenSale');
 
-return;
+const ONE_YEAR_IN_SECONDS = 86400 * 31 * 12;
+const ONE_MONTH_PERIOD_IN_SECONDS = 86400 * 31; // 31 days for a ideal month
+const RELEASE_RATE_PER_MONTH = 10;
+
 
 contract("TeamToken Integration tests", async ([_, owner, buyer, another, vesting, pauser1, pauser2, vestor1, vestor2, ...otherAccounts]) => {
 
@@ -78,7 +79,9 @@ contract("TeamToken Integration tests", async ([_, owner, buyer, another, vestin
         }
         this.vestingPeriods.push(vestingPeriod);
 
-        await this.tokenSale.addVestingLock(start, {from: owner});
+        const tokenVesting = await TokenVesting.new(vesting, start, ONE_YEAR_IN_SECONDS, ONE_MONTH_PERIOD_IN_SECONDS, RELEASE_RATE_PER_MONTH, owner, this.tokenSale.address);
+
+        await this.tokenSale.addVestingLock(start,  tokenVesting.address, {from: owner});
         this.timeLocks[i] = await this.tokenSale.getTimeLockAddress(start);
 
         start = start.add(this.periodLength);
