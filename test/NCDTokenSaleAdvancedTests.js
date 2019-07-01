@@ -4,9 +4,9 @@ const should = require('chai').should();
 const { expect } = require('chai');
 const { ZERO_ADDRESS } = constants;
 
-const NCDToken = artifacts.require('NCDToken');
+const NCDToken = artifacts.require('NCDTokenImpl');
 const TokenVesting = artifacts.require('TokenVestingImpl');
-const NCDTokenSale = artifacts.require('NCDTokenSale');
+const NCDTokenSale = artifacts.require('NCDTokenSaleImpl');
 
 const ONE_YEAR_IN_SECONDS = 86400 * 31 * 12;
 const ONE_MONTH_PERIOD_IN_SECONDS = 86400 * 31; // 31 days for a ideal month
@@ -20,20 +20,17 @@ contract("CrowdSale tests", async ([_, owner, buyer, vesting, pauser1, pauser2, 
       // Advance to the next block to correctly read time in the solidity "now" function interpreted by ganache
       await time.advanceBlock();
 
-      token = await NCDToken.new({from: owner});
-      await token.initialize( owner, [pauser1, pauser2]);
+      token = await NCDToken.new(owner, [pauser1, pauser2], {from: owner});
     });
 
     it('reverts if token shall get minted after crowdsale has already finished', async function() {
-      token = await NCDToken.new({from: owner});
-      await token.initialize( owner, [pauser1, pauser2]);
+      token = await NCDToken.new(owner, [pauser1, pauser2], {from: owner});
 
       openingTime = (await time.latest()).add(time.duration.weeks(1));
       closingTime = openingTime.add(time.duration.years(1));
       afterClosingTime = closingTime.add(time.duration.seconds(1));
 
-      tokenSale = await NCDTokenSale.new({from: owner});
-      await tokenSale.initialize(owner, openingTime, closingTime, token.address);
+      tokenSale = await NCDTokenSale.new(owner, openingTime, closingTime, token.address, {from: owner});
 
       await time.increaseTo(afterClosingTime);
       await time.advanceBlock();
@@ -45,15 +42,13 @@ contract("CrowdSale tests", async ([_, owner, buyer, vesting, pauser1, pauser2, 
     context('once token was bought', function () {
 
       beforeEach(async function () {
-          token = await NCDToken.new({from: owner});
-          await token.initialize( owner, [pauser1, pauser2]);
+          token = await NCDToken.new(owner, [pauser1, pauser2], {from: owner});
 
           openingTime = await time.latest();
           closingTime = openingTime.add(time.duration.years(1));
           afterClosingTime = closingTime.add(time.duration.seconds(1));
 
-          tokenSale = await NCDTokenSale.new({from: owner});
-          await tokenSale.initialize(owner, openingTime, closingTime, token.address);
+          tokenSale = await NCDTokenSale.new(owner, openingTime, closingTime, token.address, {from: owner});
 
           await token.addMinter(tokenSale.address, {from: owner});
           await token.renounceMinter({ from: owner });

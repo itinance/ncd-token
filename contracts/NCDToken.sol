@@ -12,7 +12,7 @@ contract NCDToken is Initializable, ERC20Detailed, ERC20Mintable, ERC20Pausable 
      * @dev Initializes with a minter and an array of pausers
      */
     function initialize(address owner, address[] memory pausers) public initializer {
-        require(pausers[0] != address(0));
+        require(pausers[0] != address(0), "NCDToken: Pausers need at least one address");
 
         ERC20Detailed.initialize("NCDToken", "NCD", uint8(18));
         ERC20Mintable.initialize(owner);

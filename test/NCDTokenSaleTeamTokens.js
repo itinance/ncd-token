@@ -6,8 +6,8 @@ const { ZERO_ADDRESS } = constants;
 
 const TeamVesting = artifacts.require('TeamVesting');
 const TokenVesting = artifacts.require('TokenVestingImpl');
-const NCDToken = artifacts.require('NCDToken');
-const NCDTokenSale = artifacts.require('NCDTokenSale');
+const NCDToken = artifacts.require('NCDTokenImpl');
+const NCDTokenSale = artifacts.require('NCDTokenSaleImpl');
 
 const ONE_YEAR_IN_SECONDS = 86400 * 31 * 12;
 const ONE_MONTH_PERIOD_IN_SECONDS = 86400 * 31; // 31 days for a ideal month
@@ -39,11 +39,9 @@ contract("CrowdSale TeamToken tests", async ([_, owner, buyer, another, pauser1,
       this.vestingStart2 = this.vestingStart1.add(time.duration.days(31));
       this.vestingRelease2 = this.vestingStart2.add(this.cliffDuration);
 
-      this.token = await NCDToken.new({from: owner});
-      await this.token.initialize( owner, [pauser1, pauser2]);
+      this.token = await NCDToken.new(owner, [pauser1, pauser2], {from: owner});
 
-      this.tokenSale = await NCDTokenSale.new({from: owner});
-      await this.tokenSale.initialize(owner, this.openingTime, this.closingTime, this.token.address);
+      this.tokenSale = await NCDTokenSale.new(owner, this.openingTime, this.closingTime, this.token.address, {from: owner});
 
       await this.token.addMinter(this.tokenSale.address, {from: owner});
       await this.token.renounceMinter({ from: owner });
