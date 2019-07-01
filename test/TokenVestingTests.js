@@ -6,7 +6,6 @@ const should = require('chai').should();
 const TokenVesting = artifacts.require('TokenVesting');
 const NCDToken = artifacts.require('NCDToken');
 
-
 contract("TokenVesting", async ([_, owner, beneficiary, pauser, ...otherAccounts]) => {
 
     const amount = new BN('1000');
@@ -21,13 +20,13 @@ contract("TokenVesting", async ([_, owner, beneficiary, pauser, ...otherAccounts
 
     it('reverts with a null beneficiary', async function () {
         const vesting = await TokenVesting.new();
-        await shouldFail.reverting(vesting.initialize(ZERO_ADDRESS, this.start, this.cliffDuration, this.periodLength, this.periodRate, owner));
+        await shouldFail.reverting(vesting.initialize(ZERO_ADDRESS, this.start, this.cliffDuration, this.periodLength, this.periodRate, owner, ZERO_ADDRESS));
     });
 
     it('reverts with a null duration', async function () {
         const vesting = await TokenVesting.new();
         // cliffDuration should also be 0, since the duration must be larger than the cliff
-        await shouldFail.reverting(vesting.initialize(beneficiary, this.start, 0, 0, this.periodRate, owner));
+        await shouldFail.reverting(vesting.initialize(beneficiary, this.start, 0, 0, this.periodRate, owner, ZERO_ADDRESS));
     });
 
     it('reverts if the end time is in the past', async function () {
@@ -36,7 +35,7 @@ contract("TokenVesting", async ([_, owner, beneficiary, pauser, ...otherAccounts
 
         this.start = now.sub(this.cliffDuration).sub(time.duration.minutes(1));
         await shouldFail.reverting(
-            vesting.initialize(beneficiary, this.start, this.cliffDuration, this.periodLength, this.periodRate, owner )
+            vesting.initialize(beneficiary, this.start, this.cliffDuration, this.periodLength, this.periodRate, owner, ZERO_ADDRESS )
         );
     });
 
@@ -45,7 +44,7 @@ contract("TokenVesting", async ([_, owner, beneficiary, pauser, ...otherAccounts
 
         beforeEach(async function () {
             this.vesting = await TokenVesting.new();
-            await this.vesting.initialize(beneficiary, this.start, this.cliffDuration, this.periodLength, this.periodRate, owner);
+            await this.vesting.initialize(beneficiary, this.start, this.cliffDuration, this.periodLength, this.periodRate, owner, ZERO_ADDRESS);
 
             this.token = await NCDToken.new({from: owner});
             await this.token.initialize( owner, [pauser]);

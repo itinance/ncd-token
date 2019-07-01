@@ -38,10 +38,6 @@ contract NCDTokenSale is Initializable, Ownable, MinterRole {
     event VestedTokensWithdrawed(uint256 indexed timestampOfRequest, address indexed timeLockAddress, uint256 vestingPeriodStart,
         uint256 releaseTime, uint256 amount);
 
-    event Log(string label, string data);
-    event LogU(string label, uint256 data);
-    event LogA(string label, address data);
-
     /**
      * @dev Reverts if not in crowdsale time range.
      */
@@ -64,6 +60,10 @@ contract NCDTokenSale is Initializable, Ownable, MinterRole {
 
         _openingTime = openingTime;
         _closingTime = closingTime;
+    }
+
+    function teamVesting() public view returns (address) {
+        return _teamVesting;
     }
 
     function getTeamTokensTotal() public view returns (uint256) {
@@ -114,10 +114,18 @@ contract NCDTokenSale is Initializable, Ownable, MinterRole {
      * @dev Assigns final team vesting address, that is used by TokenVesting contract as target beneficiary. Vesting rules are declared at whitepaper (https://nuco.cloud)
      */
     function assignTeamVesting(address teamVesting) public onlyOwner {
-        require(teamVesting != address(0), "NCDTokenSale: no Zero address allowed as team vesting contract");
+        require(teamVesting != address(0), "NCDTokenSale: no Zero address allowed as team vesting address");
 
         _teamVesting = teamVesting;
         emit TeamVestingAssigned(_teamVesting);
+
+        // update time locks/token vesting contracts as well
+        if(_timeLocks.length > 0) {
+            for(uint256 i = 0; i < _timeLocks.length; i++) {
+                TokenVesting vesting = _timeLocks[i];
+                vesting.updateBeneficiary(teamVesting);
+            }
+        }
     }
 
     /**
@@ -147,7 +155,7 @@ contract NCDTokenSale is Initializable, Ownable, MinterRole {
 
         TokenVesting vesting = new TokenVesting();
         vesting.initialize(_teamVesting, vestingPeriodStart, ONE_YEAR_IN_SECONDS,
-            ONE_MONTH_PERIOD_IN_SECONDS, RELEASE_RATE_PER_MONTH, owner());
+            ONE_MONTH_PERIOD_IN_SECONDS, RELEASE_RATE_PER_MONTH, owner(), address(this));
 
         _vestingPeriodsStart.push(vestingPeriodStart);
         _timeLocks.push(vesting);

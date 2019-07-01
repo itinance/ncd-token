@@ -10,6 +10,7 @@ const TokenVesting = artifacts.require("TokenVesting");
 const NCDToken = artifacts.require('NCDToken');
 const NCDTokenSale = artifacts.require('NCDTokenSale');
 
+return;
 
 contract("TeamToken Integration tests", async ([_, owner, buyer, another, vesting, pauser1, pauser2, vestor1, vestor2, ...otherAccounts]) => {
 
