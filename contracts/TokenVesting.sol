@@ -163,11 +163,11 @@ contract TokenVesting is Initializable, Ownable, ITokenVesting {
             return 0;
         }
 
-        uint256 _totalBalance = _totalBalance(token);
+        uint256 balance = _totalBalance(token);
         uint256 secondsSinceCliff = block.timestamp.sub(_cliff);
 
         uint256 percentInPeriod = secondsSinceCliff.mul(10**MATH_PRECISION).div(_periodLength).div(_periodRate);
-        return _totalBalance.mul(percentInPeriod).div(10**MATH_PRECISION);
+        return balance.mul(percentInPeriod).div(10**MATH_PRECISION);
     }
 
     uint256[50] private ______gap;

@@ -61,23 +61,23 @@ contract NCDTokenSale is Initializable, Ownable, MinterRole {
         _closingTime = closingTime;
     }
 
-    function getTeamTokensTotal() public view returns (uint256) {
+    function getTeamTokensTotal() external view returns (uint256) {
         return _teamTokensTotal;
     }
 
-    function getTeamTokensReleased() public view returns (uint256) {
+    function getTeamTokensReleased() external view returns (uint256) {
         return _teamTokensReleased;
     }
 
-    function getTeamTokensUnreleased() public view returns (uint256) {
+    function getTeamTokensUnreleased() external view returns (uint256) {
         return _teamTokensUnreleased;
     }
 
-    function getOpeningTime() public view returns (uint256) {
+    function getOpeningTime() external view returns (uint256) {
         return _openingTime;
     }
 
-    function getClosingTime() public view returns (uint256) {
+    function getClosingTime() external view returns (uint256) {
         return _closingTime;
     }
 
@@ -100,7 +100,7 @@ contract NCDTokenSale is Initializable, Ownable, MinterRole {
      * @dev Checks whether the period in which the crowdsale is open has already elapsed.
      * @return Whether crowdsale period has elapsed
      */
-    function hasClosed() public view returns (bool) {
+    function hasClosed() external view returns (bool) {
         // solhint-disable-next-line not-rely-on-time
         return block.timestamp > _closingTime;
     }
@@ -117,7 +117,7 @@ contract NCDTokenSale is Initializable, Ownable, MinterRole {
      * @param beneficiary Token purchaser
      * @param tokenAmount Number of tokens to be minted
      */
-    function mintTokens(address beneficiary, uint256 tokenAmount) public onlyMinter onlyWhileOpen {
+    function mintTokens(address beneficiary, uint256 tokenAmount) external onlyMinter onlyWhileOpen {
         _teamTokensTotal = _teamTokensTotal.add(tokenAmount);
         _teamTokensUnreleased = _teamTokensUnreleased.add(tokenAmount);
 
@@ -127,7 +127,7 @@ contract NCDTokenSale is Initializable, Ownable, MinterRole {
     /**
      * @dev Add vesting lock contract for vested team tokens according to the Whitepaper (https://nuco.cloud)
      */
-    function addVestingLock(uint256 vestingPeriodStart, ITokenVesting vesting) public onlyOwner {
+    function addVestingLock(uint256 vestingPeriodStart, ITokenVesting vesting) external onlyOwner {
         require(address(vesting) != address(0));
 
         _vestingPeriodsStart.push(vestingPeriodStart);
@@ -166,7 +166,7 @@ contract NCDTokenSale is Initializable, Ownable, MinterRole {
      * @dev mints and withdrawals team related token into the token vesting contract according for current timestamp within ICO
      * @dev it is meant to execute this function at the end of every monthly period
      */
-    function withdrawVestedTokens() public returns(uint256) {
+    function withdrawVestedTokens() external returns(uint256) {
         return withdrawVestedTokensByTimestamp(block.timestamp);
     }
 
