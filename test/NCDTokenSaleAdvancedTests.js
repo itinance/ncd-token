@@ -5,8 +5,12 @@ const { expect } = require('chai');
 const { ZERO_ADDRESS } = constants;
 
 const NCDToken = artifacts.require('NCDToken');
-
+const TokenVesting = artifacts.require('TokenVestingImpl');
 const NCDTokenSale = artifacts.require('NCDTokenSale');
+
+const ONE_YEAR_IN_SECONDS = 86400 * 31 * 12;
+const ONE_MONTH_PERIOD_IN_SECONDS = 86400 * 31; // 31 days for a ideal month
+const RELEASE_RATE_PER_MONTH = 10;
 
 contract("CrowdSale tests", async ([_, owner, buyer, vesting, pauser1, pauser2, anotherMinter, ...otherAccounts]) => {
     let token, tokenSale,
@@ -90,13 +94,17 @@ contract("CrowdSale tests", async ([_, owner, buyer, vesting, pauser1, pauser2, 
           vestingRelease2 = vestingStart2.add(time.duration.days(31*12))
           ;
 
-        let {logs} = await tokenSale.addVestingLock(vestingStart1, {from: owner});
+        const tokenVesting = await TokenVesting.new(vesting, vestingStart1, ONE_YEAR_IN_SECONDS, ONE_MONTH_PERIOD_IN_SECONDS, RELEASE_RATE_PER_MONTH, owner, ZERO_ADDRESS);
+        let {logs} = await tokenSale.addVestingLock(vestingStart1, tokenVesting.address, {from: owner});
+
         expectEvent.inLogs(logs, 'VestingLockAdded', {
           vestingPeriodStart: vestingStart1,
           releaseTime: vestingRelease1,
         });
 
-        const tx = await tokenSale.addVestingLock(vestingStart2, {from: owner});
+        const tokenVesting2 = await TokenVesting.new(vesting, vestingStart2, ONE_YEAR_IN_SECONDS, ONE_MONTH_PERIOD_IN_SECONDS, RELEASE_RATE_PER_MONTH, owner, ZERO_ADDRESS);
+        const tx = await tokenSale.addVestingLock(vestingStart2, tokenVesting2.address, {from: owner});
+
         logs = tx.logs;
         expectEvent.inLogs(logs, 'VestingLockAdded', {
           vestingPeriodStart: vestingStart2,

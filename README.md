@@ -21,3 +21,11 @@ In the 14th Month further 50 Token can get released into the vesting contract, w
 In the 15th Month another 150 Token can get released into VC, which got now in total 300 token which means that 30 token can get withdrewed into teams wallets.
 
 And so on .,..
+
+
+# Known issues in Unit tests
+
+"Cannot increase current time (6214995149) to a moment in the past (6214995148)"
+
+From time to time, in 1 out of 10,11,12... test runs this error is thrown running on ganache-cli. We use quiet offen openzeppelin-test-helpers in order to increase the blockchain timestamp/block height for testing events that will happen in the future. Sometimes, this error is happening then for no known reasons.
+

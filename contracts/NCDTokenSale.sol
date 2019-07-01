@@ -9,6 +9,7 @@ import "openzeppelin-eth/contracts/access/roles/MinterRole.sol";
 import "./NCDToken.sol";
 import "./TokenVesting.sol";
 
+
 contract NCDTokenSale is Initializable, Ownable, MinterRole {
     using SafeMath for uint256;
 
@@ -150,13 +151,15 @@ contract NCDTokenSale is Initializable, Ownable, MinterRole {
     /**
      * @dev Add vesting lock contract for vested team tokens according to the Whitepaper (https://nuco.cloud)
      */
-    function addVestingLock(uint256 vestingPeriodStart) public onlyOwner {
+    function addVestingLock(uint256 vestingPeriodStart, TokenVesting vesting) public onlyOwner {
         require(_teamVesting != address(0));
+        require(address(vesting) != address(0));
 
+/*
         TokenVesting vesting = new TokenVesting();
         vesting.initialize(_teamVesting, vestingPeriodStart, ONE_YEAR_IN_SECONDS,
             ONE_MONTH_PERIOD_IN_SECONDS, RELEASE_RATE_PER_MONTH, owner(), address(this));
-
+*/
         _vestingPeriodsStart.push(vestingPeriodStart);
         _timeLocks.push(vesting);
 

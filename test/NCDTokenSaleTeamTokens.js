@@ -4,11 +4,15 @@ const should = require('chai').should();
 const { expect } = require('chai');
 const { ZERO_ADDRESS } = constants;
 
-const TokenTimelock = artifacts.require("TokenTimelock");
-const TeamVesting = artifacts.require("TeamVesting");
-const TokenVesting = artifacts.require("TokenVesting");
+const TeamVesting = artifacts.require('TeamVesting');
+const TokenVesting = artifacts.require('TokenVestingImpl');
 const NCDToken = artifacts.require('NCDToken');
 const NCDTokenSale = artifacts.require('NCDTokenSale');
+
+const ONE_YEAR_IN_SECONDS = 86400 * 31 * 12;
+const ONE_MONTH_PERIOD_IN_SECONDS = 86400 * 31; // 31 days for a ideal month
+const RELEASE_RATE_PER_MONTH = 10;
+
 
 contract("CrowdSale TeamToken tests", async ([_, owner, buyer, another, pauser1, pauser2, vestor1, vestor2, ...otherAccounts]) => {
 
@@ -56,16 +60,22 @@ contract("CrowdSale TeamToken tests", async ([_, owner, buyer, another, pauser1,
     })
 
     it('reverts if a non-owner tries to add a vesting lock ', async function() {
+      const tokenVesting = await TokenVesting.new(this.vesting.address, this.vestingStart1, ONE_YEAR_IN_SECONDS, ONE_MONTH_PERIOD_IN_SECONDS, RELEASE_RATE_PER_MONTH, owner, ZERO_ADDRESS);
+
       await shouldFail.reverting(
-        this.tokenSale.addVestingLock(this.vestingStart1)
+        this.tokenSale.addVestingLock(this.vestingStart1, tokenVesting.address)
       );
     })
 
     context('once deployed', function () {
         beforeEach(async function () {
           // Prepare vesting Locks
-          await this.tokenSale.addVestingLock(this.vestingStart1, {from: owner});
-          await this.tokenSale.addVestingLock(this.vestingStart2, {from: owner});
+
+          const tokenVesting1 = await TokenVesting.new(this.vesting.address, this.vestingStart1, ONE_YEAR_IN_SECONDS, ONE_MONTH_PERIOD_IN_SECONDS, RELEASE_RATE_PER_MONTH, owner, this.tokenSale.address);
+          await this.tokenSale.addVestingLock(this.vestingStart1, tokenVesting1.address, {from: owner});
+
+          const tokenVesting2 = await TokenVesting.new(this.vesting.address, this.vestingStart2, ONE_YEAR_IN_SECONDS, ONE_MONTH_PERIOD_IN_SECONDS, RELEASE_RATE_PER_MONTH, owner, this.tokenSale.address);
+          await this.tokenSale.addVestingLock(this.vestingStart2, tokenVesting2.address, {from: owner});
 
           await time.increaseTo(this.openingTime);
           await time.advanceBlock();
