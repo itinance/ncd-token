@@ -8,12 +8,12 @@
     "start-blank": "rm -rf client/src && cp -rf barebones/src client/",
     "coverage": "./node_modules/.bin/solidity-coverage"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/rrecuero/zepkit.git"
-  },
   "keywords": [
     "zeppelinos",
+    "nuco",
+    "ncdtoken",
+    "token",
+    "erc20",
     "openzeppelin",
     "truffle",
     "react"
@@ -21,9 +21,9 @@
   "author": "Hagen Huebel <hhuebel@itinance.com>",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/rrecuero/zepkit/issues"
+    "url": "https://github.com/itinance/ncd-token/issues"
   },
-  "homepage": "https://github.com/rrecuero/zepkit#readme",
+  "homepage": "https://nuco.cloud",
   "dependencies": {
     "openzeppelin-eth": "^2.1.3",
     "solidity-coverage": "^0.5.11",
