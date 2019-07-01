@@ -7,7 +7,7 @@ import "openzeppelin-eth/contracts/token/ERC20/TokenTimelock.sol";
 import "openzeppelin-eth/contracts/access/roles/MinterRole.sol";
 
 import "./NCDToken.sol";
-import "./TokenVesting.sol";
+import "./ITokenVesting.sol";
 
 
 contract NCDTokenSale is Initializable, Ownable, MinterRole {
@@ -26,7 +26,7 @@ contract NCDTokenSale is Initializable, Ownable, MinterRole {
     uint256 private _teamTokensUnreleased;
     uint256 private _teamTokensReleased;
 
-    TokenVesting[] private _timeLocks;
+    ITokenVesting[] private _timeLocks;
     uint256[] private _vestingPeriodsStart;
 
     event VestingLockAdded(uint256 indexed vestingPeriodStart, uint256 indexed releaseTime, address indexed timeLockAddress,
@@ -127,7 +127,7 @@ contract NCDTokenSale is Initializable, Ownable, MinterRole {
     /**
      * @dev Add vesting lock contract for vested team tokens according to the Whitepaper (https://nuco.cloud)
      */
-    function addVestingLock(uint256 vestingPeriodStart, TokenVesting vesting) public onlyOwner {
+    function addVestingLock(uint256 vestingPeriodStart, ITokenVesting vesting) public onlyOwner {
         require(address(vesting) != address(0));
 
         _vestingPeriodsStart.push(vestingPeriodStart);
@@ -143,7 +143,7 @@ contract NCDTokenSale is Initializable, Ownable, MinterRole {
         for(uint256 i = _vestingPeriodsStart.length-1; i >= 0; i--) {
             uint256 vestingPeriodStart = _vestingPeriodsStart[i];
             if(vestingPeriodStart <= timestamp) {
-                TokenVesting vesting = _timeLocks[i];
+                ITokenVesting vesting = _timeLocks[i];
                 if(vesting.start() <= timestamp && timestamp <= vesting.cliff()) {
                     return (vestingPeriodStart, vesting.cliff(), address(vesting));
                 }
@@ -158,7 +158,7 @@ contract NCDTokenSale is Initializable, Ownable, MinterRole {
     }
 
     function getTimeLockDataByIndex(uint256 index) public view returns (address, address, uint256, uint256, uint256, uint256 ) {
-        TokenVesting vesting = _timeLocks[index];
+        ITokenVesting vesting = _timeLocks[index];
         return (address(vesting), vesting.beneficiary(), vesting.start(), vesting.cliff(), vesting.periodLength(), vesting.periodRate());
     }
 

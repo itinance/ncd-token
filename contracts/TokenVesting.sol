@@ -6,7 +6,7 @@ import "openzeppelin-eth/contracts/math/SafeMath.sol";
 import "openzeppelin-eth/contracts/token/ERC20/IERC20.sol";
 import "openzeppelin-eth/contracts/token/ERC20/SafeERC20.sol";
 
-//import "./ITokenVesting.sol";
+import "./ITokenVesting.sol";
 
 /**
  * @title TokenVesting
@@ -14,7 +14,7 @@ import "openzeppelin-eth/contracts/token/ERC20/SafeERC20.sol";
  * typical vesting scheme, with a cliff and vesting period. Optionally revocable by the
  * owner.
  */
-contract TokenVesting is Initializable, Ownable  {
+contract TokenVesting is Initializable, Ownable, ITokenVesting {
     // The vesting schedule is time-based (i.e. using block timestamps as opposed to e.g. block numbers), and is
     // therefore sensitive to timestamp manipulation (which is something miners can do, to a certain degree). Therefore,
     // it is recommended to avoid using short time durations (less than a minute). Typical vesting schemes, with a
@@ -71,14 +71,14 @@ contract TokenVesting is Initializable, Ownable  {
     /**
      * @return the beneficiary of the tokens.
      */
-    function beneficiary() public view returns (address) {
+    function beneficiary() external view returns (address) {
         return _beneficiary;
     }
 
     /**
      * @dev Update beneficiary
      */
-    function updateBeneficiary(address newBeneficiary) public onlyOwner {
+    function updateBeneficiary(address newBeneficiary) external onlyOwner {
         address oldBeneficiary = _beneficiary;
         _beneficiary = newBeneficiary;
         emit BeneficiaryUpdate(_beneficiary, oldBeneficiary);
@@ -87,29 +87,29 @@ contract TokenVesting is Initializable, Ownable  {
     /**
      * @return the cliff time of the token vesting.
      */
-    function cliff() public view returns (uint256) {
+    function cliff() external view returns (uint256) {
         return _cliff;
     }
 
     /**
      * @return the start time of the token vesting.
      */
-    function start() public view returns (uint256) {
+    function start() external view returns (uint256) {
         return _start;
     }
 
-    function periodLength() public view returns (uint256) {
+    function periodLength() external view returns (uint256) {
         return _periodLength;
     }
 
-    function periodRate() public view returns (uint256) {
+    function periodRate() external view returns (uint256) {
         return _periodRate;
     }
 
     /**
      * @return the amount of the token released.
      */
-    function released(address token) public view returns (uint256) {
+    function released(address token) external view returns (uint256) {
         return _released[token];
     }
 
@@ -117,7 +117,7 @@ contract TokenVesting is Initializable, Ownable  {
      * @notice Transfers vested tokens to beneficiary.
      * @param token ERC20 token which is being vested
      */
-    function release(IERC20 token) public {
+    function release(IERC20 token) external {
         uint256 unreleased = _releasableAmount(token);
 
         require(unreleased > 0, "TokenVesting: there are no token available to release yet");
@@ -134,10 +134,14 @@ contract TokenVesting is Initializable, Ownable  {
      * @param token ERC20 token which is being vested
      */
     function _releasableAmount(IERC20 token) private view returns (uint256) {
-        return vestedAmount(token).sub(_released[address(token)]);
+        return _vestedAmount(token).sub(_released[address(token)]);
     }
 
-    function totalBalance(IERC20 token) public view returns (uint256) {
+    function totalBalance(IERC20 token) external view returns (uint256) {
+        return _totalBalance(token);
+    }
+
+    function _totalBalance(IERC20 token) internal view returns (uint256) {
         uint256 currentBalance = token.balanceOf(address(this));
         return currentBalance.add(_released[address(token)]);
     }
@@ -146,12 +150,20 @@ contract TokenVesting is Initializable, Ownable  {
      * @dev Calculates the amount that has already vested.
      * @param token ERC20 token which is being vested
      */
-    function vestedAmount(IERC20 token) public view returns (uint256) {
+    function vestedAmount(IERC20 token) external view returns (uint256) {
+        return _vestedAmount(token);
+    }
+
+    /**
+     * @dev Calculates the amount that has already vested.
+     * @param token ERC20 token which is being vested
+     */
+    function _vestedAmount(IERC20 token) internal view returns (uint256) {
         if (block.timestamp < _cliff) {
             return 0;
         }
 
-        uint256 _totalBalance = totalBalance(token);
+        uint256 _totalBalance = _totalBalance(token);
         uint256 secondsSinceCliff = block.timestamp.sub(_cliff);
 
         uint256 percentInPeriod = secondsSinceCliff.mul(10**MATH_PRECISION).div(_periodLength).div(_periodRate);
