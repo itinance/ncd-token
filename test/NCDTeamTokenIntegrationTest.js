@@ -12,16 +12,13 @@ const ONE_YEAR_IN_SECONDS = 86400 * 31 * 12;
 const ONE_MONTH_PERIOD_IN_SECONDS = 86400 * 31; // 31 days for a ideal month
 const RELEASE_RATE_PER_MONTH = 10;
 
+return;
 
 contract("TeamToken Integration tests", async ([_, owner, buyer, another, vesting, pauser1, pauser2, vestor1, vestor2, ...otherAccounts]) => {
 
     before(async function () {
       // Advance to the next block to correctly read time in the solidity "now" function interpreted by ganache
       await time.advanceBlock();
-
-
-      const x = new TokenVesting('0x2353e45fF9613cFB05CC797E15cC37fd0d7F9658', 1561886117, 3600, 3600, 10, '0x2353e45fF9613cFB05CC797E15cC37fd0d7F9658', '0xE855fB9DEEc8aF624dC794Df1A2521F964538bC4')
-
     });
 
     beforeEach(async function () {
