@@ -17,8 +17,6 @@ contract("CrowdSale TeamToken tests", async ([_, owner, buyer, another, pauser1,
       await time.advanceBlock();
     });
 
-
-
     beforeEach(async function () {
       // Define time range of the crows sale
       this.openingTime = (await time.latest()).add(time.duration.weeks(1));
@@ -105,8 +103,69 @@ contract("CrowdSale TeamToken tests", async ([_, owner, buyer, another, pauser1,
           expect(this.vestingRelease2).to.be.bignumber.equal(tl2[3]); // cliff
           expect(this.periodLength).to.be.bignumber.equal(tl2[4]); // periodLength
           expect(this.periodRate).to.equal(tl2[5].toNumber()); // periodRate
-
         })
+
+        it('token sale contract is updater in vesting locks/contracts', async function() {
+          const vesting = await TokenVesting.at(this.timeLock1);
+          expect(await vesting.updaterRole()).to.equal(this.tokenSale.address);
+        })
+
+        it('isOwnerOrUpdater() just works', async function() {
+          const vesting = await TokenVesting.at(this.timeLock1);
+          expect(await vesting.isOwnerOrUpdater({from: owner})).to.equal(true);
+
+          // token sale is updaterRole
+          expect(await vesting.isOwnerOrUpdater({from: this.tokenSale.address})).to.equal(true);
+
+          // vesting-address is not
+          expect(await vesting.isOwnerOrUpdater({from: this.vesting.address})).to.equal(false);
+
+          // others are not as well
+          expect(await vesting.isOwnerOrUpdater({from: buyer})).to.equal(false);
+        })
+
+        it('reverts if somebody tries to call assignTeamVesting without permissions', async function () {
+          expect( await this.tokenSale.teamVesting()).to.equal(this.vesting.address);
+          await shouldFail.reverting(this.tokenSale.assignTeamVesting(another, {from: another}));
+          expect( await this.tokenSale.teamVesting()).to.equal(this.vesting.address);
+        } )
+
+        it('reverts if somebody tries to update beneficiary that is not allowed to do so', async function () {
+          const vesting = await TokenVesting.at(this.timeLock1);
+          expect( await vesting.beneficiary()).to.equal(this.vesting.address);
+
+          await shouldFail.reverting(vesting.updateBeneficiary(another, {from: buyer}));
+
+          expect( await vesting.beneficiary()).to.equal(this.vesting.address);
+        } )
+
+        it('can change team vesting beneficiary on a single vesting contract', async function () {
+          const vesting = await TokenVesting.at(this.timeLock1);
+          const tx = await vesting.updateBeneficiary(another, {from: owner});
+
+          const { logs } = tx;
+
+          expectEvent.inLogs(logs, 'BeneficiaryUpdate', {
+            beneficiary: another,
+            oldBeneficiary: this.vesting.address,
+          });
+
+          expect( await vesting.beneficiary()).to.equal(another);
+        } )
+
+        it('can update team vesting beneficiary on all active vesting contracts once', async function () {
+          const tx = await this.tokenSale.assignTeamVesting(another, {from: owner});
+
+          const vesting = await TokenVesting.at(this.timeLock1);
+          expect( await vesting.beneficiary() ).to.equal(another);
+
+          expectEvent.inLogs(tx.logs, 'TeamVestingAssigned', {
+            teamVesting: another,
+          });
+
+          const vesting2 = await TokenVesting.at(this.timeLock2);
+          expect( await vesting2.beneficiary()).to.equal(another);
+        } )
 
         context('Collecting team tokens', function () {
 
@@ -278,7 +337,7 @@ contract("CrowdSale TeamToken tests", async ([_, owner, buyer, another, pauser1,
             // and will get 1000 token as expected
 
             let timestampOfRequest = this.vestingStart1.add(time.duration.days(4));
-            let {logs} = await this.tokenSale.withdrawVestedTokensByTimestamp( timestampOfRequest );
+            let { logs } = await this.tokenSale.withdrawVestedTokensByTimestamp( timestampOfRequest );
 
             // 1000 tokens are expected to get
             expectEvent.inLogs(logs, 'VestedTokensWithdrawed', {

@@ -24,6 +24,8 @@ contract TokenVesting is Initializable, Ownable {
 
     event TokensReleased(address token, uint256 amount);
 
+    event BeneficiaryUpdate(address beneficiary, address oldBeneficiary);
+
     // beneficiary of tokens after they are released
     address private _beneficiary;
 
@@ -38,6 +40,8 @@ contract TokenVesting is Initializable, Ownable {
     mapping (address => uint256) private _released;
     mapping (address => bool) private _revoked;
 
+    address private _updaterRole;
+
     /**
      * @dev Creates a vesting contract that vests its balance of any ERC20 token to the
      * beneficiary, gradually in a linear fashion until start + duration. By then all
@@ -47,7 +51,7 @@ contract TokenVesting is Initializable, Ownable {
      * @param start the time (as Unix time) at which point vesting starts
      * @param owner The owner
      */
-    function initialize(address beneficiary, uint256 start, uint256 cliffDuration, uint256 periodLength, uint256 periodRate, address owner) public initializer {
+    function initialize(address beneficiary, uint256 start, uint256 cliffDuration, uint256 periodLength, uint256 periodRate, address owner, address updaterRole) public initializer {
         Ownable.initialize(owner);
 
         require(beneficiary != address(0), "TokenVesting: beneficiary is zero address");
@@ -59,9 +63,32 @@ contract TokenVesting is Initializable, Ownable {
         _beneficiary = beneficiary;
         _periodLength = periodLength;
         _periodRate = periodRate;
+        _updaterRole = updaterRole;
 
         _cliff = start.add(cliffDuration);
         _start = start;
+    }
+
+    /**
+     * @dev Throws if called by any account other than the owner.
+     */
+    modifier onlyOwnerOrUpdater() {
+        require(isOwnerOrUpdater(), "TokenVesting: only Owner or updaterRole is allowed to execute this function");
+        _;
+    }
+
+    /**
+     * @dev the address of an updater role
+     */
+    function updaterRole() public view returns (address) {
+        return _updaterRole;
+    }
+
+    /**
+     * @dev returns true if msg.sender is owner or is updaterRole-address
+     */
+    function isOwnerOrUpdater() public view returns (bool) {
+        return isOwner() || msg.sender == _updaterRole;
     }
 
     /**
@@ -69,6 +96,15 @@ contract TokenVesting is Initializable, Ownable {
      */
     function beneficiary() public view returns (address) {
         return _beneficiary;
+    }
+
+    /**
+     * @dev Update beneficiary
+     */
+    function updateBeneficiary(address beneficiary) public onlyOwnerOrUpdater {
+        address oldBeneficiary = _beneficiary;
+        _beneficiary = beneficiary;
+        emit BeneficiaryUpdate(_beneficiary, oldBeneficiary);
     }
 
     /**
