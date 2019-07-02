@@ -18,11 +18,8 @@ jobs:
           name: Install npm
           command: npm install
       - run:
-          name: Migrate Contracts
-          command: ./node_modules/truffle/build/cli.bundled.js migrate --network development
-      - run:
           name: Test Contracts
-          command: ./node_modules/truffle/build/cli.bundled.js test --network development
+          command: truffle test --network development
       - save_cache:
           key: dependency-cache-{{ checksum "package.json" }}
           paths:
