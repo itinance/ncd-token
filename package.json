@@ -4,7 +4,7 @@
   "description": "NCDT-Token for Nuco.Cloud",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "truffle test",
     "start-blank": "rm -rf client/src && cp -rf barebones/src client/",
     "coverage": "SOLIDITY_COVERAGE=true ./node_modules/.bin/solidity-coverage"
   },
