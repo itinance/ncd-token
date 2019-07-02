@@ -17,23 +17,30 @@ contract NCDTokenSale is Initializable, Ownable, MinterRole {
     uint256 private _openingTime;
     uint256 private _closingTime;
 
-    uint256 private constant ONE_YEAR_IN_SECONDS = 86400 * 31 * 12;
-    uint256 private constant ONE_MONTH_PERIOD_IN_SECONDS = 86400 * 31; // 31 days for a ideal month
-
-    uint256 private constant RELEASE_RATE_PER_MONTH = 10;
-
     uint256 private _teamTokensTotal;
     uint256 private _teamTokensUnreleased;
     uint256 private _teamTokensReleased;
 
+    /**
+     * @dev Array that holds all time locks / token vesting contracts
+     */
     ITokenVesting[] private _timeLocks;
+
+    /**
+     * @dev Array that holds all vesting periods as unix timestamp
+     */
     uint256[] private _vestingPeriodsStart;
 
+
+    /**
+     * An event that is dispatched after a time lock was registered for a specific period of time
+     */
     event VestingLockAdded(uint256 indexed vestingPeriodStart, uint256 indexed releaseTime, address indexed timeLockAddress,
         uint256 periodLength, uint256 periodRate);
 
-    event TeamVestingAssigned(address teamVesting);
-
+    /**
+     * An event that is dispatched after a amount of team tokens was released into Time Lock / TokenVesting contract
+     */
     event VestedTokensWithdrawed(uint256 indexed timestampOfRequest, address indexed timeLockAddress, uint256 vestingPeriodStart,
         uint256 releaseTime, uint256 amount);
 
@@ -45,6 +52,13 @@ contract NCDTokenSale is Initializable, Ownable, MinterRole {
         _;
     }
 
+    /**
+     * @dev Initializer
+     * @param owner The owner of the contract, will automatically become the initial minter
+     * @param openingTime Opening time of token sale
+     * @param closingTime Closing time of token sale
+     * @param token The token to sale
+     */
     function initialize(address owner, uint256 openingTime, uint256 closingTime, NCDToken token) public initializer {
         require(address(token) != address(0), "NCDTokenSale: Zero-Address for token is invalid");
         require(owner != address(0), "NCDTokenSale: address of Owner is invalid");
@@ -61,22 +75,37 @@ contract NCDTokenSale is Initializable, Ownable, MinterRole {
         _closingTime = closingTime;
     }
 
+    /**
+     * @return Returns the team tokens that are available in total (see vesting rules in whitepaper at https://nuco.cloud)
+     */
     function getTeamTokensTotal() external view returns (uint256) {
         return _teamTokensTotal;
     }
 
+    /**
+     * @return Returns the team tokens that were already released in total (see vesting rules in whitepaper at https://nuco.cloud)
+     */
     function getTeamTokensReleased() external view returns (uint256) {
         return _teamTokensReleased;
     }
 
+    /**
+     * @return Returns unreleased team tokens that are available to release
+     */
     function getTeamTokensUnreleased() external view returns (uint256) {
         return _teamTokensUnreleased;
     }
 
+    /**
+     * @return Opening time of token sale
+     */
     function getOpeningTime() external view returns (uint256) {
         return _openingTime;
     }
 
+    /**
+     * @return Closing time of token sale
+     */
     function getClosingTime() external view returns (uint256) {
         return _closingTime;
     }
@@ -152,11 +181,17 @@ contract NCDTokenSale is Initializable, Ownable, MinterRole {
         revert("No suitable TokenTimelock found");
     }
 
+    /**
+     * @return Returns address of a specific time lock according to a timestamp
+     */
     function getTimeLockAddress(uint256 timestamp) public view returns (address) {
         (/*uint256 vestingPeriodStart*/, /*uint256 releaseTime*/, address vesting) = findTokenTimelock(timestamp);
         return vesting;
     }
 
+    /**
+     * @return Returns all vesting related attributes for a specific time lock addressed by index
+     */
     function getTimeLockDataByIndex(uint256 index) public view returns (address, address, uint256, uint256, uint256, uint256 ) {
         ITokenVesting vesting = _timeLocks[index];
         return (address(vesting), vesting.beneficiary(), vesting.start(), vesting.cliff(), vesting.periodLength(), vesting.periodRate());
