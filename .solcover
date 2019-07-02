@@ -1,7 +1,0 @@
-coverage: {
-      host: "localhost",
-      network_id: "*",
-      port: 8545,
-      gas: 0x666C46,
-      gasPrice: 0x01
-    }
