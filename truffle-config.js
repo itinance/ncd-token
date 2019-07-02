@@ -8,6 +8,12 @@ const infuraProjectId = process.env.INFURA_API_KEY;
 //const a = new HDWalletProvider(process.env.MAIN_MNEMONIC, "https://mainnet.infura.io/v3/" + infuraProjectId);
 //console.log(a.getAddresses());
 
+/*const a = new HDWalletProvider(
+  process.env.DEV_MNEMONIC, "https://ropsten.infura.io/v3/" + infuraProjectId, 0, 10,
+  true, "m/44'/1'/0'/0/"
+  )
+console.log(a.getAddresses());*/
+
 
 
 module.exports = {
@@ -28,7 +34,7 @@ module.exports = {
         true, "m/44'/1'/0'/0/"
         ),
       network_id: 3,       // Ropsten's id
-      gas: 8000000,
+      gas: 3000000,
       gasPrice: 10000000000,
     },
     kovan: {
@@ -49,8 +55,8 @@ module.exports = {
     main: {
       provider: () => new HDWalletProvider(process.env.MAIN_MNEMONIC, "https://mainnet.infura.io/v3/" + infuraProjectId),
       network_id: 1,
-      gas: 8000000,
-      gasPrice: 10000000000
+      gas: 3000000,
+      gasPrice: 20000000000
     }
   },
   mocha: {
