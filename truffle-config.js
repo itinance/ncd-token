@@ -57,19 +57,31 @@ module.exports = {
       network_id: 1,
       gas: 3000000,
       gasPrice: 20000000000
-    }
+    },
+    coverage: {
+      host: "localhost",
+      network_id: "*",
+      port: 8555,         // <-- If you change this, also set the port option in .solcover.js.
+      gas: 0xfffffffffff, // <-- Use this high gas value
+      gasPrice: 0x01      // <-- Use this low gas price
+    },
   },
   mocha: {
-    reporter: 'eth-gas-reporter',
+    reporter: (!process.env.SOLIDITY_COVERAGE) ? 'eth-gas-reporter' : 'spec',
     reporterOptions : {
       currency: 'EUR',
       gasPrice: 21
     }
   },
-  solc: {
-    optimizer: {
-        enabled: true,
-        runs: 200,
+  compilers: {
+    solc: {
+      version: "0.5.7",
+      settings: {
+        optimizer: {
+          enabled: true,
+          runs: 200
+        },
+      }
     }
   }
 };
