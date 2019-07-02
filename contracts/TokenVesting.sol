@@ -24,13 +24,22 @@ contract TokenVesting is Initializable, Ownable, ITokenVesting {
     using SafeMath for uint256;
     using SafeERC20 for IERC20;
 
+    /**
+     * @dev This event gets dispatched when tokens get released out of this contract
+     */
     event TokensReleased(address token, uint256 amount);
 
+    /**
+     * @dev This event will be dispatched after the beneficiary was updated (e.g. a new custody provider)
+     */
     event BeneficiaryUpdate(address beneficiary, address oldBeneficiary);
 
     // beneficiary of tokens after they are released
     address private _beneficiary;
 
+    /**
+     * @dev precision that is used to do proper division of a integer
+     */
     uint256 private constant MATH_PRECISION = 10;
 
     // Durations and timestamps are expressed in UNIX time, the same units as block.timestamp.
@@ -85,7 +94,7 @@ contract TokenVesting is Initializable, Ownable, ITokenVesting {
     }
 
     /**
-     * @return the cliff time of the token vesting.
+     * @return the cliff time of the token vesting. As long as cliff period is not over, no tokens can ret transfered
      */
     function cliff() external view returns (uint256) {
         return _cliff;
@@ -98,10 +107,16 @@ contract TokenVesting is Initializable, Ownable, ITokenVesting {
         return _start;
     }
 
+    /**
+     * @return The length of a period in seconds, in which a possible rate as maximum can be transfered out of this contract
+     */
     function periodLength() external view returns (uint256) {
         return _periodLength;
     }
 
+    /**
+     * @return The rate in absolute percent, which can be transfered out of the contract in a specific period
+     */
     function periodRate() external view returns (uint256) {
         return _periodRate;
     }
@@ -137,6 +152,9 @@ contract TokenVesting is Initializable, Ownable, ITokenVesting {
         return _vestedAmount(token).sub(_released[address(token)]);
     }
 
+    /**
+     * @return Returns the total balance of this vesting contract for a specific token
+     */
     function totalBalance(IERC20 token) external view returns (uint256) {
         return _totalBalance(token);
     }
