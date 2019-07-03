@@ -1,28 +1,35 @@
-# Deploment on Mainnet
+# Deployment on Mainnet
 
 ## Protocoll
 
 ### 2019-07-02 14:00:00 Deploy contracts
 
+Initially:
+
+```
 Owner: 0x078dC1BAc6570cA60b00bb4Ba2a37aE3C3F25CC6
 Minter: 0x078dC1BAc6570cA60b00bb4Ba2a37aE3C3F25CC6
 Pauser: 0x078dC1BAc6570cA60b00bb4Ba2a37aE3C3F25CC6
-
+```
 
 ### Opening Time: 1558569600
+```
 05/23/2019 @ 12:00am (UTC)
 2019-05-23T00:00:00+00:00 in ISO 8601
 Thu, 23 May 2019 00:00:00 +0000 in RFC 822, 1036, 1123, 2822
 Thursday, 23-May-19 00:00:00 UTC in RFC 2822
 2019-05-23T00:00:00+00:00 in RFC 3339
+```
 
 ### Closing time: 1593561599
 
+```
 06/30/2020 @ 11:59pm (UTC)
 2020-06-30T23:59:59+00:00 in ISO 8601
 Tue, 30 Jun 2020 23:59:59 +0000 in RFC 822, 1036, 1123, 2822
 Tuesday, 30-Jun-20 23:59:59 UTC in RFC 2822
 2020-06-30T23:59:59+00:00 in RFC 3339
+```
 
 # 1. Push contracts
 
@@ -99,6 +106,7 @@ Instance of Token: 0x9D38d8bC4993fF4E8574b807290e8eF0676E1B98
 
 # 3.2. Create NCDTokenSale Instance
 
+```
 $ zos create --network main --timeout 1000000 --skip-compile --verbose --verbose
 ? Pick a contract to instantiate NCDTokenSale
 [2019-07-02T17:46:36.815Z@Session.js#getOptions] <started> Using session with network main, sender address 0x078dC1BAc6570cA60b00bb4Ba2a37aE3C3F25CC6
@@ -117,7 +125,7 @@ $ zos create --network main --timeout 1000000 --skip-compile --verbose --verbose
 [2019-07-02T17:50:13.343Z@BaseSimpleProject.js#_getAndLogInitCallData] <succeeded> Instance created at 0x09c736B404889b48e5BC174232F91FF45886809e
 0x09c736B404889b48e5BC174232F91FF45886809e
 [2019-07-02T17:50:14.064Z@ZosNetworkFile.js#write] <started> Updated zos.mainnet.json
-
+```
 
 # 3.3. Make NCDTokenSale a minter on NCDToken
 
