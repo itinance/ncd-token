@@ -55,7 +55,11 @@ contract TokenVesting is Initializable, Ownable, ITokenVesting {
      * @dev Creates a vesting contract that vests its balance of any ERC20 token to the
      * beneficiary, gradually in a linear fashion until start + duration. By then all
      * of the balance will have vested.
-     * @param beneficiary address of the beneficiary to whom vested tokens are transferred
+     *
+     * An zero address for beneficiary is allowed in order to deploy this contract without any.
+     * However, no release will happen until a valid address was set with `updateBeneficiary`
+     *
+     * @param beneficiary address of the beneficiary to whom vested tokens are transferred. Can be zero at time of creation
      * @param cliffDuration duration in seconds of the cliff in which tokens will begin to vest
      * @param start the time (as Unix time) at which point vesting starts
      * @param owner The owner
@@ -63,7 +67,6 @@ contract TokenVesting is Initializable, Ownable, ITokenVesting {
     function initialize(address beneficiary, uint256 start, uint256 cliffDuration, uint256 periodLength, uint256 periodRate, address owner) public initializer {
         Ownable.initialize(owner);
 
-        require(beneficiary != address(0), "TokenVesting: beneficiary is zero address");
         require(cliffDuration > 0, "TokenVesting: cliff must be > 0" );
         require(periodLength > 0, "TokenVesting: periodLength must be > 0");
         require(periodRate > 0, "TokenVesting: periodRate must be > 0");
@@ -133,6 +136,8 @@ contract TokenVesting is Initializable, Ownable, ITokenVesting {
      * @param token ERC20 token which is being vested
      */
     function release(IERC20 token) external {
+        require(_beneficiary != address(0), "TokenVesting: beneficiary is zero address");
+
         uint256 unreleased = _releasableAmount(token);
 
         require(unreleased > 0, "TokenVesting: there are no token available to release yet");

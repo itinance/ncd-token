@@ -18,8 +18,8 @@ contract("TokenVesting", async ([_, owner, beneficiary, pauser, ...otherAccounts
       this.periodRate = 10;
     });
 
-    it('reverts with a null beneficiary', async function () {
-        await shouldFail.reverting(TokenVesting.new(ZERO_ADDRESS, this.start, this.cliffDuration, this.periodLength, this.periodRate, owner));
+    it('don\'t reverts with a null beneficiary', async function () {
+        TokenVesting.new(ZERO_ADDRESS, this.start, this.cliffDuration, this.periodLength, this.periodRate, owner);
     });
 
     it('reverts with a null duration', async function () {
@@ -101,7 +101,5 @@ contract("TokenVesting", async ([_, owner, beneficiary, pauser, ...otherAccounts
             (await this.token.balanceOf(beneficiary)).should.bignumber.equal(releasedAmount);
             (await this.vesting.released(this.token.address)).should.bignumber.equal(releasedAmount);
         });
-
     })
-
 });
