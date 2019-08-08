@@ -4,7 +4,9 @@
 The NCDT-Token are part of the ICO of Nuco.Cloud.
 
 URL: [https://nuco.cloud/](https://nuco.cloud/)
+
 Whitepaper: [https://nuco.cloud/#whitepaper](https://nuco.cloud/#whitepaper)
+
 FAQ: [https://nuco.cloud/#faq](https://nuco.cloud/#faq)
 
 # Deployment Protocol
