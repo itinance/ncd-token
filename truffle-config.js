@@ -66,7 +66,7 @@ module.exports = {
       gasPrice: 0x01      // <-- Use this low gas price
     },
   },
-  mocha: {
+  _mocha: {
     reporter: (!process.env.SOLIDITY_COVERAGE) ? 'eth-gas-reporter' : 'spec',
     reporterOptions : {
       currency: 'EUR',
