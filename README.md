@@ -67,11 +67,10 @@ Month 1 Crowdsale: 100 Token sold
 Month 2 Crowdsale: 50 Token sold
 Month 3 Crowdsale: 150 token sold
 
-Therefor in the 13th Month can 100 Token get released into the vesting contract, but only 10% can be transfered out of it to wallets of team members
-
-In the 14th Month further 50 Token can get released into the vesting contract, which got in total 150 token yet, which means that 15 token can be withdrewed into team members wallets
-
+Therefor in the 13th Month can 100 Token get released into the vesting contract, but only 10% can be transfered out of it to wallets of team members.
+In the 14th Month further 50 Token can get released into the vesting contract, which got in total 150 token yet, which means that 15 token can be withdrewed into team members wallets.
 In the 15th Month another 150 Token can get released into VC, which got now in total 300 token which means that 30 token can get withdrewed into teams wallets.
+Since date-related arithmetic is not that easy in Solidity and Ethereum we are going to work with "ideal 31 days month" (means: in Token Vesting Contract every month is 31 days long). This enhances the vesting period for team tokens for some days but this will not affect any investor! 
 
 And so on .,..
 
