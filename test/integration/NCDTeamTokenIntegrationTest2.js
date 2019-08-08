@@ -8,7 +8,7 @@ const TokenVesting = artifacts.require("TokenVestingImpl");
 const NCDToken = artifacts.require('NCDTokenImpl');
 const NCDTokenSale = artifacts.require('NCDTokenSaleImpl');
 
-const ONE_YEAR_IN_SECONDS = 86400 * 31 * 12;
+const ONE_YEAR_IN_SECONDS = 86400 * 31 * 12; // SIMPLIFIED FOR our tests here (31 days per month)
 const ONE_MONTH_PERIOD_IN_SECONDS = 86400 * 31; // 31 days for a ideal month
 const RELEASE_RATE_PER_MONTH = 10;
 

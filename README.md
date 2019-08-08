@@ -1,3 +1,46 @@
+
+# What is it about?
+
+The NCDT-Token are part of the ICO of Nuco.Cloud.
+
+URL: https://nuco.cloud/
+Whitepaper: https://nuco.cloud/#whitepaper
+FAQ: https://nuco.cloud/#faq 
+
+# Getting started
+
+## Prerequisites
+
+Install the following tools globally (or using npx)
+- node
+- npm
+- ganache-cli
+- truffle-suite
+
+## Installation
+
+Checkout and intall dependencies
+
+```
+git clone git@github.com:nucocloud/ncd-token.git
+cd ncd-token
+npm install 
+```
+
+## Running tests:
+
+1. start ganache
+
+```
+ganache-cli --mnemonic “your twelve word mnemonic here”
+```
+
+2. In a new terminal, run tests:
+
+```
+truffle test
+```
+
 # Vesting / Team Tokens
 
 

@@ -590,6 +590,15 @@
         "admin": "0x44Ab61e9b9E32a8Da7aC804969D3803DA10d8b1F",
         "kind": "Upgradeable"
       }
+    ],
+    "ncdt/TokenVesting": [
+      {
+        "address": "0x4685e6402a6BD5b98B0E61A553dc24F5458d4C4c",
+        "version": "v1.3.0",
+        "implementation": "0x0C19D6baEF6Eb7C1889Dc12F26896B61b56dbfFf",
+        "admin": "0x44Ab61e9b9E32a8Da7aC804969D3803DA10d8b1F",
+        "kind": "Upgradeable"
+      }
     ]
   },
   "zosversion": "2.2",
