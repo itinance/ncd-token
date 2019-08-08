@@ -3,9 +3,13 @@
 
 The NCDT-Token are part of the ICO of Nuco.Cloud.
 
-URL: https://nuco.cloud/
-Whitepaper: https://nuco.cloud/#whitepaper
-FAQ: https://nuco.cloud/#faq 
+URL: [https://nuco.cloud/](https://nuco.cloud/)
+Whitepaper: [https://nuco.cloud/#whitepaper](https://nuco.cloud/#whitepaper)
+FAQ: [https://nuco.cloud/#faq](https://nuco.cloud/#faq)
+
+# Deployment Protocol
+
+URL: [DEPLOYMENT.md](https://github.com/itinance/ncd-token/blob/master/DEPLOYMENT.md)
 
 # Getting started
 
