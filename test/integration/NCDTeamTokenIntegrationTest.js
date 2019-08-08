@@ -13,7 +13,6 @@ const ONE_MONTH_PERIOD_IN_SECONDS = 86400 * 31; // 31 days for a ideal month
 const RELEASE_RATE_PER_MONTH = 10;
 
 return;
-
 contract("TeamToken Integration tests", async ([_, owner, buyer, another, vesting, pauser1, pauser2, vestor1, vestor2, ...otherAccounts]) => {
 
     before(async function () {
@@ -39,18 +38,18 @@ contract("TeamToken Integration tests", async ([_, owner, buyer, another, vestin
 
       // this array contains tokens that would be bought during an ICO over 12 months. Every month has a entry wizh the amount
       this.tokensBought = [
-        100, // 1. Month
-        200, // 2. Month
-        60,  // 3. Month
-        300, // 4. Month
-        150, // 5. Month
-        220, // 6. Month
-        300, // 7. Month
-        160, // 8. Month
-        50,  // 9. Month
-        120, // 10. Month
-        240, // 11. Month
-        210, // 12. Month
+        {bought: 100, expectedBeingReleased: 10}, // 1. Month
+        {bought: 200, expectedBeingReleased: 10+20}, // 2. Month
+        {bought:  60, expectedBeingReleased: 10+20+6},  // 3. Month
+        {bought: 300, expectedBeingReleased: 10+20+6+30}, // 4. Month
+        {bought: 150, expectedBeingReleased: 10+20+6+30+15}, // 5. Month
+        {bought: 220, expectedBeingReleased: 10+20+6+30+15+22}, // 6. Month
+        {bought: 300, expectedBeingReleased: 10+20+6+30+15+22+30}, // 7. Month
+        {bought: 160, expectedBeingReleased: 10+20+6+30+15+22+30+16}, // 8. Month
+        {bought:  50, expectedBeingReleased: 10+20+6+30+15+22+30+16+5},  // 9. Month
+        {bought: 120, expectedBeingReleased: 10+20+6+30+15+22+30+16+5+12}, // 10. Month
+        {bought: 240, expectedBeingReleased: 10+20+6+30+15+22+30+16+5+12+24}, // 11. Month
+        {bought: 210, expectedBeingReleased: 10+20+6+30+15+22+30+16+5+12+24+21}, // 12. Month
       ];
 
       //this.totalTokens = this.tokensBought => arr.reduce((a,b) => a + b, 0);
@@ -111,7 +110,10 @@ contract("TeamToken Integration tests", async ([_, owner, buyer, another, vestin
       }
     })
 
+
     context('once token was bought', function () {
+
+      
         beforeEach(async function () {
           console.log("Starting one-year-simulation");
 
@@ -120,7 +122,7 @@ contract("TeamToken Integration tests", async ([_, owner, buyer, another, vestin
           let saldo = 0;
 
           for(let month = 0; month < 12; month++) {
-            const amount = this.tokensBought[month];
+            const amount = this.tokensBought[month].bought;
 
             // console.log("- month " + month + ': minting ' + amount + ' token');
 
@@ -141,7 +143,7 @@ contract("TeamToken Integration tests", async ([_, owner, buyer, another, vestin
             expect(await this.token.balanceOf(timeLock)).to.be.bignumber.equal( '0' );
             await this.tokenSale.withdrawVestedTokens();
 
-            const vesting = await TokenVesting.at(this.timeLocks[month]);
+            const vesting = await TokenVesting.at(timeLock);
             await shouldFail.reverting( vesting.release(this.token.address) );
 
             /*for(let i = 0; i < 12; ++i) {
@@ -150,6 +152,9 @@ contract("TeamToken Integration tests", async ([_, owner, buyer, another, vestin
 
             saldo += amount;
             expect(await this.token.balanceOf(timeLock)).to.be.bignumber.equal( amount.toString() );
+
+            //let vestingSaldo = await calcSaldoAcrossAllVestingContracts(this)
+            //console.log(month, vestingSaldo.toString());
           };
 
           await time.advanceBlock();
@@ -165,34 +170,62 @@ contract("TeamToken Integration tests", async ([_, owner, buyer, another, vestin
           expect(await this.tokenSale.getTeamTokensTotal()).to.be.bignumber.equal('2110');
         })
 
+        it('has registered all vesting tokens across all vesting contracts', async function() {
+          let vestingSaldo = await calcSaldoAcrossAllVestingContracts(this);
+          expect(await vestingSaldo).to.be.bignumber.equal('2110');
+      })
 
         context('one year later', function() {
           beforeEach(async function () {
               await time.advanceBlock();
           });
 
-          it('we can release tokens monthly with 10% rate ', async function() {
+          it('we can release tokens monthly with 10% rate for all 12 months', async function() {
 
+            let releasable = 0;
             for(let month = 0; month < 12; month++) {
                 const date = this.vestingPeriods[month].start;
                 const tokenVesting = await TokenVesting.at(this.timeLocks[month]);
 
                 await time.increaseTo(date.add(this.cliffDuration).add(time.duration.days(31)));
+
+                const balanceOfTimeLockBeforeRelease = await this.token.balanceOf(tokenVesting.address);
+
                 await tokenVesting.release(this.token.address);
 
-                console.log(month, (await this.token.balanceOf(vesting)).toString());
-              }
+                const expectedToReleasePerSingleMonth = this.tokensBought[month].bought * 0.1;
+                const expectedBeingReleased = this.tokensBought[month].expectedBeingReleased;
 
+                const balanceOfTimeLock = await this.token.balanceOf(tokenVesting.address);
+
+                console.log(month, balanceOfTimeLockBeforeRelease.toString(), expectedBeingReleased.toString());
+
+                // Balance of this current timelock was decreased by currents monthly expected rate per this timelock in this month
+                expect( balanceOfTimeLock ).to.be.bignumber.equal(balanceOfTimeLockBeforeRelease.sub(new BN(expectedToReleasePerSingleMonth) ) );
+
+                releasable += expectedToReleasePerSingleMonth
+                console.log(month, balanceOfTimeLockBeforeRelease.toString(), balanceOfTimeLock.toString(), 
+                  ':', expectedToReleasePerSingleMonth, expectedBeingReleased, releasable, (await this.token.balanceOf(vesting)).toString());
+
+                // Global vesting address gets all released tokens in
+                expect( await this.token.balanceOf(vesting) ).to.be.bignumber.equal( expectedBeingReleased.toString() );
+                expect( await this.token.balanceOf(vesting) ).to.be.bignumber.equal( releasable.toString() );
+              }
 
             //await tokenVesting.release(this.token.address);
             //expect(await this.token.balanceOf(vesting)).to.be.bignumber.equal('10');
           })
-
-
         })
-
-
     });
-
-
 });
+
+async function calcSaldoAcrossAllVestingContracts(self) {
+  let vestingSaldo = new BN(0);
+  for(let m = 0; m < 12; m++) {
+    if(typeof self.timeLocks[m] !== 'string') continue;
+    const vesting = await TokenVesting.at(self.timeLocks[m]);
+    const saldo = await self.token.balanceOf(vesting.address);
+    vestingSaldo = vestingSaldo.add(saldo);
+  }
+  return vestingSaldo;
+}

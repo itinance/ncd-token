@@ -97,7 +97,7 @@ contract TokenVesting is Initializable, Ownable, ITokenVesting {
     }
 
     /**
-     * @return the cliff time of the token vesting. As long as cliff period is not over, no tokens can ret transfered
+     * @return the cliff time of the token vesting. As long as cliff period is not over, no tokens can get transfered
      */
     function cliff() external view returns (uint256) {
         return _cliff;

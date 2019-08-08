@@ -1,7 +1,6 @@
 const { BN, ether, constants, expectEvent, shouldFail, time } = require('openzeppelin-test-helpers');
 const { ZERO_ADDRESS } = constants;
 
-
 const NCDToken = artifacts.require('NCDTokenImpl');
 const NCDTokenSale = artifacts.require('NCDTokenSaleImpl');
 

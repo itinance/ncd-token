@@ -35,6 +35,8 @@ contract("TokenVesting", async ([_, owner, beneficiary, pauser, ...otherAccounts
         );
     });
 
+    // TODO: add Tests for updateBeneficiary
+
 
     context('once deployed', function () {
 
