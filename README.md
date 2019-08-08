@@ -23,6 +23,10 @@ Install the following tools globally (or using npx)
 - ganache-cli
 - truffle-suite
 
+We assume that you are already familiar with Ethereum development and its toolset including Ganache, Truffle-Suite and also OpenZeppelin as framework (or even better ZeppelinOS) and that you have everything setup on your development machine.
+
+Let's continue:
+
 ## Installation
 
 Checkout and intall dependencies
