@@ -216,7 +216,7 @@ contract NCDTokenSale is Initializable, Ownable, MinterRole {
 
         require(amount > 0, "NCDTokenSale: no tokens available yet");
 
-        // find the appropriate TimeLock according to the  timestamp
+        // find the appropriate TimeLock according to the timestamp
         (uint256 vestingPeriodStart, uint256 releaseTime, address vesting) = findTokenTimelock(timestamp);
 
         require(vesting != address(0), "NCDTokenSale: vesting-address is required");
