@@ -104,6 +104,7 @@ contract("TokenVesting", async ([_, owner, buyer, another, vesting, pauser1, pau
 
 
                 for(let month = 0; month < this.tokensBought.length; month++) {
+                    const amount = this.tokensBought[month].bought;
 
                     const date = this.vestingPeriods[month].start;
                     const dateVesting = this.vestingPeriods[month].start.add(new BN(ONE_YEAR_IN_SECONDS + ONE_MONTH_PERIOD_IN_SECONDS - 1));
@@ -115,10 +116,8 @@ contract("TokenVesting", async ([_, owner, buyer, another, vesting, pauser1, pau
                     const tokenVesting = await TokenVesting.at(timeLock);
                     console.log(tokenVesting.address);
 
-                    try {
+                    if(amount > 0) {
                         await tokenVesting.release(this.token.address);
-                    } catch(e) {
-                        //console.log(e);
                     }
                 }
             });
