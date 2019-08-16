@@ -186,11 +186,18 @@ contract TokenVesting is Initializable, Ownable, ITokenVesting {
             return 0;
         }
 
+        uint256 currentBalance = token.balanceOf(address(this));
         uint256 balance = _totalBalance(token);
         uint256 secondsSinceCliff = block.timestamp.sub(_cliff);
 
         uint256 percentInPeriod = secondsSinceCliff.mul(10**MATH_PRECISION).div(_periodLength).div(_periodRate);
-        return balance.mul(percentInPeriod).div(10**MATH_PRECISION);
+
+        if(percentInPeriod > 10000000000) percentInPeriod = 10000000000;
+
+        uint256 calculatedBalance = balance.mul(percentInPeriod).div(10**MATH_PRECISION);
+
+        if(calculatedBalance > currentBalance) return currentBalance;
+        return calculatedBalance;
     }
 
     uint256[50] private ______gap;

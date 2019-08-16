@@ -121,6 +121,7 @@ contract("TokenVesting", async ([_, owner, buyer, another, vesting, pauser1, pau
                     }
                 }
             });
-        });    
+
+        })
     })
 });

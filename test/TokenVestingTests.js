@@ -71,6 +71,14 @@ contract("TokenVesting", async ([_, owner, beneficiary, pauser, ...otherAccounts
             });
         });
 
+        it('should determine proper amount after cliff', async function () {
+            // at the end of the first month after cliff
+            await time.increaseTo(this.start.add(this.cliffDuration).add(this.periodLength));
+
+            const releasedAmount = '100'; // 10 Percent of the 1000 token            
+            (await this.vesting.vestedAmount(this.token.address)).should.bignumber.equal(releasedAmount);
+        });
+
         it('should release proper amount after cliff', async function () {
             // at the end of the first month after cliff
             await time.increaseTo(this.start.add(this.cliffDuration).add(this.periodLength));
@@ -103,5 +111,25 @@ contract("TokenVesting", async ([_, owner, beneficiary, pauser, ...otherAccounts
             (await this.token.balanceOf(beneficiary)).should.bignumber.equal(releasedAmount);
             (await this.vesting.released(this.token.address)).should.bignumber.equal(releasedAmount);
         });
+
+        it('should determine proper amount after cliff and after all vesting periods', async function () {
+            // at the end of the first month after cliff
+            await time.increaseTo(this.start.add(this.cliffDuration).add(this.periodLength.mul(new BN(11))));
+
+            const releasedAmount = '1000'; // 100 Percent of the 1000 tokens
+            (await this.vesting.vestedAmount(this.token.address)).should.bignumber.equal(releasedAmount);
+        });
+
+        it('can release 1000 token even far ahead of last vesting period', async function () {
+            // at the end of the first month after cliff
+            await time.increaseTo(this.start.add(this.cliffDuration).add(this.periodLength.mul(new BN(12))));
+
+            const releasedAmount = '1000'; // 100 Percent of the 1000 tokens
+            this.vesting.release(this.token.address);
+            (await this.vesting.released(this.token.address)).should.bignumber.equal(releasedAmount);
+            (await this.token.balanceOf(beneficiary)).should.bignumber.equal(releasedAmount);
+            (await this.vesting.vestedAmount(this.token.address)).should.bignumber.equal('0');
+        });
+
     })
 });
