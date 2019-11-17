@@ -1,7 +1,7 @@
 {
   "contracts": {
     "NCDToken": {
-      "address": "0xD245AF3653b5eb0a0C45A671002E3CE5832C7462",
+      "address": "0x0EA808992dfd4831a3dA4f118646B8813D6fd0Dd",
       "constructorCode": "608060405234801561001057600080fd5b50611850806100206000396000f3fe",
       "bodyBytecodeHash": "06600ab806a12f6ab65d1b8057174a815fdfdcbf1198ae6981b097b6d879f086",
       "localBytecodeHash": "695abf48aa5be8bc8406941448f215e1ff6d2ac595be9bd39ad53ec41fdca102",
@@ -219,169 +219,30 @@
         "hasSelfDestruct": false,
         "hasDelegateCall": false,
         "hasInitialValuesInDeclarations": false,
-        "uninitializedBaseContracts": []
-      }
-    },
-    "TokenVesting": {
-      "address": "0x4de76343Ea2B030f297F1C2EBe5B0500F0e950bC",
-      "constructorCode": "608060405234801561001057600080fd5b50610ed7806100206000396000f3fe",
-      "bodyBytecodeHash": "5b74825028033f75fb9e7786f5f308d014c619fdf482a640e2512897f0bb776d",
-      "localBytecodeHash": "0d8da2c25128860313d72027b622a009cf26e6332e340673801a497f0ca8cf89",
-      "deployedBytecodeHash": "0d8da2c25128860313d72027b622a009cf26e6332e340673801a497f0ca8cf89",
-      "types": {
-        "t_bool": {
-          "id": "t_bool",
-          "kind": "elementary",
-          "label": "bool"
-        },
-        "t_uint256": {
-          "id": "t_uint256",
-          "kind": "elementary",
-          "label": "uint256"
-        },
-        "t_array:50<t_uint256>": {
-          "id": "t_array:50<t_uint256>",
-          "valueType": "t_uint256",
-          "length": "50",
-          "kind": "array",
-          "label": "uint256[50]"
-        },
-        "t_address": {
-          "id": "t_address",
-          "kind": "elementary",
-          "label": "address"
-        },
-        "t_mapping<t_uint256>": {
-          "id": "t_mapping<t_uint256>",
-          "valueType": "t_uint256",
-          "label": "mapping(key => uint256)",
-          "kind": "mapping"
-        },
-        "t_mapping<t_bool>": {
-          "id": "t_mapping<t_bool>",
-          "valueType": "t_bool",
-          "label": "mapping(key => bool)",
-          "kind": "mapping"
-        }
-      },
-      "storage": [
-        {
-          "contract": "Initializable",
-          "path": "zos-lib/contracts/Initializable.sol",
-          "label": "initialized",
-          "astId": 3453,
-          "type": "t_bool",
-          "src": "757:24:21"
-        },
-        {
-          "contract": "Initializable",
-          "path": "zos-lib/contracts/Initializable.sol",
-          "label": "initializing",
-          "astId": 3455,
-          "type": "t_bool",
-          "src": "876:25:21"
-        },
-        {
-          "contract": "Initializable",
-          "path": "zos-lib/contracts/Initializable.sol",
-          "label": "______gap",
-          "astId": 3511,
-          "type": "t_array:50<t_uint256>",
-          "src": "1951:29:21"
-        },
-        {
-          "contract": "Ownable",
-          "path": "openzeppelin-eth/contracts/ownership/Ownable.sol",
-          "label": "_owner",
-          "astId": 2338,
-          "type": "t_address",
-          "src": "302:22:13"
-        },
-        {
-          "contract": "Ownable",
-          "path": "openzeppelin-eth/contracts/ownership/Ownable.sol",
-          "label": "______gap",
-          "astId": 2449,
-          "type": "t_array:50<t_uint256>",
-          "src": "2186:29:13"
-        },
-        {
-          "contract": "TokenVesting",
-          "path": "contracts/TokenVesting.sol",
-          "label": "_beneficiary",
-          "astId": 1234,
-          "type": "t_address",
-          "src": "1760:28:4"
-        },
-        {
-          "contract": "TokenVesting",
-          "path": "contracts/TokenVesting.sol",
-          "label": "_cliff",
-          "astId": 1239,
-          "type": "t_uint256",
-          "src": "2027:22:4"
-        },
-        {
-          "contract": "TokenVesting",
-          "path": "contracts/TokenVesting.sol",
-          "label": "_start",
-          "astId": 1241,
-          "type": "t_uint256",
-          "src": "2055:22:4"
-        },
-        {
-          "contract": "TokenVesting",
-          "path": "contracts/TokenVesting.sol",
-          "label": "_periodLength",
-          "astId": 1243,
-          "type": "t_uint256",
-          "src": "2083:29:4"
-        },
-        {
-          "contract": "TokenVesting",
-          "path": "contracts/TokenVesting.sol",
-          "label": "_periodRate",
-          "astId": 1245,
-          "type": "t_uint256",
-          "src": "2118:27:4"
-        },
-        {
-          "contract": "TokenVesting",
-          "path": "contracts/TokenVesting.sol",
-          "label": "_released",
-          "astId": 1249,
-          "type": "t_mapping<t_uint256>",
-          "src": "2152:46:4"
-        },
-        {
-          "contract": "TokenVesting",
-          "path": "contracts/TokenVesting.sol",
-          "label": "_revoked",
-          "astId": 1253,
-          "type": "t_mapping<t_bool>",
-          "src": "2204:42:4"
-        },
-        {
-          "contract": "TokenVesting",
-          "path": "contracts/TokenVesting.sol",
-          "label": "______gap",
-          "astId": 1688,
-          "type": "t_array:50<t_uint256>",
-          "src": "8354:29:4"
-        }
-      ],
-      "warnings": {
-        "hasConstructor": false,
-        "hasSelfDestruct": false,
-        "hasDelegateCall": false,
-        "hasInitialValuesInDeclarations": false,
         "uninitializedBaseContracts": [],
-        "storageUncheckedVars": [],
+        "storageUncheckedVars": [
+          {
+            "contract": "MinterRole",
+            "path": "openzeppelin-eth/contracts/access/roles/MinterRole.sol",
+            "label": "_minters",
+            "astId": 1768,
+            "type": "t_struct<Roles.Role>",
+            "src": "271:27:9"
+          },
+          {
+            "contract": "PauserRole",
+            "path": "openzeppelin-eth/contracts/access/roles/PauserRole.sol",
+            "label": "_pausers",
+            "astId": 1887,
+            "type": "t_struct<Roles.Role>",
+            "src": "271:27:10"
+          }
+        ],
         "storageDiff": []
       }
     },
     "NCDTokenSale": {
-      "address": "0xc4229D6E6101224391e3dB5C50a9DD9A3f3E4590",
+      "address": "0x2f1D5e532742954Ecc3A02a41f89Bbc7BdC41ae5",
       "constructorCode": "608060405234801561001057600080fd5b50611838806100206000396000f3fe",
       "bodyBytecodeHash": "ebcc607b5de46d960a958cf9afa4aec7a6d319dbf2d4801c4f89a9ffc00d6bec",
       "localBytecodeHash": "0e73659375cd8f5481e36c2313d095c3404ac3afb0a58957b17805455dc50545",
@@ -573,12 +434,12 @@
         "uninitializedBaseContracts": []
       }
     },
-    "TeamVesting": {
-      "address": "0x99FCdE214905b236cA207fE40b3EefC03bFA4aaA",
-      "constructorCode": "608060405234801561001057600080fd5b50610ef7806100206000396000f3fe",
-      "bodyBytecodeHash": "b53e3758daf852c89b452da9c856cd49b0aad5ea4b7587dcdb0c32cd7c882184",
-      "localBytecodeHash": "159d752457b600a8471e5eb1e2feb2eceb7fb47843dceca5ebede711a31da7c6",
-      "deployedBytecodeHash": "159d752457b600a8471e5eb1e2feb2eceb7fb47843dceca5ebede711a31da7c6",
+    "TokenVesting": {
+      "address": "0x227c04492d88c2e99Beb70cf204f27CEe7fE7592",
+      "constructorCode": "608060405234801561001057600080fd5b50610cb9806100206000396000f3fe",
+      "bodyBytecodeHash": "cbf41c1c4671c08d9f7e8722841afd7670384ba202af3edb285ba74ecc6199a8",
+      "localBytecodeHash": "1fffff4aca16bfa8a63e16cbf1377456c6bde3a58758456b5e5c028b46f84544",
+      "deployedBytecodeHash": "1fffff4aca16bfa8a63e16cbf1377456c6bde3a58758456b5e5c028b46f84544",
       "types": {
         "t_bool": {
           "id": "t_bool",
@@ -602,28 +463,16 @@
           "kind": "elementary",
           "label": "address"
         },
-        "t_uint8": {
-          "id": "t_uint8",
-          "kind": "elementary",
-          "label": "uint8"
-        },
-        "t_mapping<t_uint8>": {
-          "id": "t_mapping<t_uint8>",
-          "valueType": "t_uint8",
-          "label": "mapping(key => uint8)",
-          "kind": "mapping"
-        },
-        "t_array:dyn<t_address>": {
-          "id": "t_array:dyn<t_address>",
-          "valueType": "t_address",
-          "length": "dyn",
-          "kind": "array",
-          "label": "address[]"
-        },
         "t_mapping<t_uint256>": {
           "id": "t_mapping<t_uint256>",
           "valueType": "t_uint256",
           "label": "mapping(key => uint256)",
+          "kind": "mapping"
+        },
+        "t_mapping<t_bool>": {
+          "id": "t_mapping<t_bool>",
+          "valueType": "t_bool",
+          "label": "mapping(key => bool)",
           "kind": "mapping"
         }
       },
@@ -632,7 +481,7 @@
           "contract": "Initializable",
           "path": "zos-lib/contracts/Initializable.sol",
           "label": "initialized",
-          "astId": 3364,
+          "astId": 3337,
           "type": "t_bool",
           "src": "757:24:21"
         },
@@ -640,7 +489,7 @@
           "contract": "Initializable",
           "path": "zos-lib/contracts/Initializable.sol",
           "label": "initializing",
-          "astId": 3366,
+          "astId": 3339,
           "type": "t_bool",
           "src": "876:25:21"
         },
@@ -648,7 +497,7 @@
           "contract": "Initializable",
           "path": "zos-lib/contracts/Initializable.sol",
           "label": "______gap",
-          "astId": 3422,
+          "astId": 3395,
           "type": "t_array:50<t_uint256>",
           "src": "1951:29:21"
         },
@@ -656,7 +505,7 @@
           "contract": "Ownable",
           "path": "openzeppelin-eth/contracts/ownership/Ownable.sol",
           "label": "_owner",
-          "astId": 2249,
+          "astId": 2222,
           "type": "t_address",
           "src": "302:22:13"
         },
@@ -664,57 +513,73 @@
           "contract": "Ownable",
           "path": "openzeppelin-eth/contracts/ownership/Ownable.sol",
           "label": "______gap",
-          "astId": 2360,
+          "astId": 2333,
           "type": "t_array:50<t_uint256>",
           "src": "2186:29:13"
         },
         {
-          "contract": "TeamVesting",
-          "path": "contracts/TeamVesting.sol",
-          "label": "_beneficiaryFactors",
-          "astId": 752,
-          "type": "t_mapping<t_uint8>",
-          "src": "1401:53:3"
-        },
-        {
-          "contract": "TeamVesting",
-          "path": "contracts/TeamVesting.sol",
-          "label": "_beneficiaries",
-          "astId": 755,
-          "type": "t_array:dyn<t_address>",
-          "src": "1495:32:3"
-        },
-        {
-          "contract": "TeamVesting",
-          "path": "contracts/TeamVesting.sol",
-          "label": "_token",
-          "astId": 757,
+          "contract": "TokenVesting",
+          "path": "contracts/TokenVesting.sol",
+          "label": "_beneficiary",
+          "astId": 1216,
           "type": "t_address",
-          "src": "1579:21:3"
+          "src": "1563:28:4"
         },
         {
-          "contract": "TeamVesting",
-          "path": "contracts/TeamVesting.sol",
-          "label": "_vestedBalances",
-          "astId": 763,
-          "type": "t_mapping<t_uint256>",
-          "src": "1660:74:3"
+          "contract": "TokenVesting",
+          "path": "contracts/TokenVesting.sol",
+          "label": "_cliff",
+          "astId": 1221,
+          "type": "t_uint256",
+          "src": "1830:22:4"
         },
         {
-          "contract": "TeamVesting",
-          "path": "contracts/TeamVesting.sol",
-          "label": "_releasedBalances",
-          "astId": 769,
-          "type": "t_mapping<t_uint256>",
-          "src": "1816:76:3"
+          "contract": "TokenVesting",
+          "path": "contracts/TokenVesting.sol",
+          "label": "_start",
+          "astId": 1223,
+          "type": "t_uint256",
+          "src": "1858:22:4"
         },
         {
-          "contract": "TeamVesting",
-          "path": "contracts/TeamVesting.sol",
-          "label": "_vestingBalances",
-          "astId": 773,
+          "contract": "TokenVesting",
+          "path": "contracts/TokenVesting.sol",
+          "label": "_periodLength",
+          "astId": 1225,
+          "type": "t_uint256",
+          "src": "1886:29:4"
+        },
+        {
+          "contract": "TokenVesting",
+          "path": "contracts/TokenVesting.sol",
+          "label": "_periodRate",
+          "astId": 1227,
+          "type": "t_uint256",
+          "src": "1921:27:4"
+        },
+        {
+          "contract": "TokenVesting",
+          "path": "contracts/TokenVesting.sol",
+          "label": "_released",
+          "astId": 1231,
           "type": "t_mapping<t_uint256>",
-          "src": "1939:53:3"
+          "src": "1955:46:4"
+        },
+        {
+          "contract": "TokenVesting",
+          "path": "contracts/TokenVesting.sol",
+          "label": "_revoked",
+          "astId": 1235,
+          "type": "t_mapping<t_bool>",
+          "src": "2007:42:4"
+        },
+        {
+          "contract": "TokenVesting",
+          "path": "contracts/TokenVesting.sol",
+          "label": "______gap",
+          "astId": 1572,
+          "type": "t_array:50<t_uint256>",
+          "src": "6920:29:4"
         }
       ],
       "warnings": {
@@ -730,92 +595,18 @@
   "proxies": {
     "ncdt/NCDToken": [
       {
-        "address": "0x5cB51E5f6a6a6807531a856BDd7972ce44eFC702",
+        "address": "0x9D38d8bC4993fF4E8574b807290e8eF0676E1B98",
         "version": "v1.3.0",
-        "implementation": "0xD245AF3653b5eb0a0C45A671002E3CE5832C7462",
+        "implementation": "0x0EA808992dfd4831a3dA4f118646B8813D6fd0Dd",
         "kind": "Upgradeable"
       }
     ],
     "ncdt/NCDTokenSale": [
       {
-        "address": "0x3fe10248A73b9E0a2585dB979CF081543B70d793",
+        "address": "0x8564Ca67d54A2f78a54271D88FB934A2F29f7592",
         "version": "v1.3.0",
-        "implementation": "0xc4229D6E6101224391e3dB5C50a9DD9A3f3E4590",
-        "admin": "0x44Ab61e9b9E32a8Da7aC804969D3803DA10d8b1F",
-        "kind": "Upgradeable"
-      }
-    ],
-    "ncdt/TokenVesting": [
-      {
-        "address": "0x4685e6402a6BD5b98B0E61A553dc24F5458d4C4c",
-        "version": "v1.3.0",
-        "implementation": "0x0C19D6baEF6Eb7C1889Dc12F26896B61b56dbfFf",
-        "admin": "0x44Ab61e9b9E32a8Da7aC804969D3803DA10d8b1F",
-        "kind": "Upgradeable"
-      },
-      {
-        "address": "0x49Ea11f6233b68368484C7476edaF19C18B3032f",
-        "version": "v1.3.0",
-        "implementation": "0x0C19D6baEF6Eb7C1889Dc12F26896B61b56dbfFf",
-        "admin": "0x44Ab61e9b9E32a8Da7aC804969D3803DA10d8b1F",
-        "kind": "Upgradeable"
-      },
-      {
-        "address": "0x69180509470B5b0493b58a70Ad2CB4388B2CdFd3",
-        "version": "v1.3.0",
-        "implementation": "0x0C19D6baEF6Eb7C1889Dc12F26896B61b56dbfFf",
-        "admin": "0x44Ab61e9b9E32a8Da7aC804969D3803DA10d8b1F",
-        "kind": "Upgradeable"
-      },
-      {
-        "address": "0xA4561002e7F64266D7F26A8835858eB4CAda6f38",
-        "version": "v1.3.0",
-        "implementation": "0x0C19D6baEF6Eb7C1889Dc12F26896B61b56dbfFf",
-        "admin": "0x44Ab61e9b9E32a8Da7aC804969D3803DA10d8b1F",
-        "kind": "Upgradeable"
-      },
-      {
-        "address": "0xaBD8b56Ff4854207FE5c381B46c0F4E5B9532ad2",
-        "version": "v1.3.0",
-        "implementation": "0x5d18923a3A5572A3Afca2771305d6B4E681b9A35",
-        "admin": "0x44Ab61e9b9E32a8Da7aC804969D3803DA10d8b1F",
-        "kind": "Upgradeable"
-      },
-      {
-        "address": "0x488E58315B214e3541761AD4539D46A21326E8C4",
-        "version": "v1.3.0",
-        "implementation": "0x5d18923a3A5572A3Afca2771305d6B4E681b9A35",
-        "admin": "0x44Ab61e9b9E32a8Da7aC804969D3803DA10d8b1F",
-        "kind": "Upgradeable"
-      },
-      {
-        "address": "0x07980E0B809D2113F984827526e936E98dF0DFd8",
-        "version": "v1.3.0",
-        "implementation": "0xAc6b24385b5512EB3A7c4F5335ae2D8f8335c742",
-        "admin": "0x44Ab61e9b9E32a8Da7aC804969D3803DA10d8b1F",
-        "kind": "Upgradeable"
-      },
-      {
-        "address": "0xA9aB96cA6D2B65DE26c4da8Cd7Ab8dE191e1eb54",
-        "version": "v1.3.0",
-        "implementation": "0xF111cC4BdC3b109FFB4913ea4d4a66e6530F8302",
-        "admin": "0x44Ab61e9b9E32a8Da7aC804969D3803DA10d8b1F",
-        "kind": "Upgradeable"
-      },
-      {
-        "address": "0x0504CEb200155a7fcfA5187142294BE0C1678B62",
-        "version": "v1.3.0",
-        "implementation": "0x4de76343Ea2B030f297F1C2EBe5B0500F0e950bC",
-        "admin": "0x44Ab61e9b9E32a8Da7aC804969D3803DA10d8b1F",
-        "kind": "Upgradeable"
-      }
-    ],
-    "ncdt/TeamVesting": [
-      {
-        "address": "0xd76F6d494aB75466729253c099CA501B5A916813",
-        "version": "v1.3.0",
-        "implementation": "0x99FCdE214905b236cA207fE40b3EefC03bFA4aaA",
-        "admin": "0x44Ab61e9b9E32a8Da7aC804969D3803DA10d8b1F",
+        "implementation": "0x2f1D5e532742954Ecc3A02a41f89Bbc7BdC41ae5",
+        "admin": "0x5F53bC0a97Dc5EEA143005dFA1f138CEb6AfaF6c",
         "kind": "Upgradeable"
       }
     ]
@@ -824,11 +615,11 @@
   "version": "v1.3.0",
   "dependencies": {
     "openzeppelin-eth": {
-      "package": "0x2a9e7b63514438906a83a1e320dbbd814d417002",
+      "package": "0x778dddf23ec1b5cb18394c6c110480caadb3b0f6",
       "version": "2.1.3"
     }
   },
   "proxyAdmin": {
-    "address": "0x44Ab61e9b9E32a8Da7aC804969D3803DA10d8b1F"
+    "address": "0x5F53bC0a97Dc5EEA143005dFA1f138CEb6AfaF6c"
   }
 }

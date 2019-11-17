@@ -1,11 +1,11 @@
 {
   "contracts": {
-    "NCDTokenSale": {
-      "address": "0x6C861114DdbC30Fb266F8DaC5b386528A8E3Cf90",
-      "constructorCode": "608060405234801561001057600080fd5b50611838806100206000396000f3fe",
-      "bodyBytecodeHash": "ebcc607b5de46d960a958cf9afa4aec7a6d319dbf2d4801c4f89a9ffc00d6bec",
-      "localBytecodeHash": "0e73659375cd8f5481e36c2313d095c3404ac3afb0a58957b17805455dc50545",
-      "deployedBytecodeHash": "0e73659375cd8f5481e36c2313d095c3404ac3afb0a58957b17805455dc50545",
+    "TokenVesting": {
+      "address": "0x2631Ec6aD599B21AC7080f32D0de782131280Fe3",
+      "constructorCode": "608060405234801561001057600080fd5b50610cb9806100206000396000f3fe",
+      "bodyBytecodeHash": "cbf41c1c4671c08d9f7e8722841afd7670384ba202af3edb285ba74ecc6199a8",
+      "localBytecodeHash": "1fffff4aca16bfa8a63e16cbf1377456c6bde3a58758456b5e5c028b46f84544",
+      "deployedBytecodeHash": "1fffff4aca16bfa8a63e16cbf1377456c6bde3a58758456b5e5c028b46f84544",
       "types": {
         "t_bool": {
           "id": "t_bool",
@@ -29,38 +29,17 @@
           "kind": "elementary",
           "label": "address"
         },
-        "t_struct<Roles.Role>": {
-          "id": "t_struct<Roles.Role>",
-          "kind": "struct",
-          "label": "Roles.Role",
-          "members": [
-            {
-              "label": "bearer",
-              "astId": 1661,
-              "type": "t_mapping<t_bool>",
-              "src": "150:32:8"
-            }
-          ]
+        "t_mapping<t_uint256>": {
+          "id": "t_mapping<t_uint256>",
+          "valueType": "t_uint256",
+          "label": "mapping(key => uint256)",
+          "kind": "mapping"
         },
         "t_mapping<t_bool>": {
           "id": "t_mapping<t_bool>",
           "valueType": "t_bool",
           "label": "mapping(key => bool)",
           "kind": "mapping"
-        },
-        "t_array:dyn<t_address>": {
-          "id": "t_array:dyn<t_address>",
-          "valueType": "t_address",
-          "length": "dyn",
-          "kind": "array",
-          "label": "address[]"
-        },
-        "t_array:dyn<t_uint256>": {
-          "id": "t_array:dyn<t_uint256>",
-          "valueType": "t_uint256",
-          "length": "dyn",
-          "kind": "array",
-          "label": "uint256[]"
         }
       },
       "storage": [
@@ -105,84 +84,68 @@
           "src": "2186:29:13"
         },
         {
-          "contract": "MinterRole",
-          "path": "openzeppelin-eth/contracts/access/roles/MinterRole.sol",
-          "label": "_minters",
-          "astId": 1768,
-          "type": "t_struct<Roles.Role>",
-          "src": "271:27:9"
-        },
-        {
-          "contract": "MinterRole",
-          "path": "openzeppelin-eth/contracts/access/roles/MinterRole.sol",
-          "label": "______gap",
-          "astId": 1867,
-          "type": "t_array:50<t_uint256>",
-          "src": "1081:29:9"
-        },
-        {
-          "contract": "NCDTokenSale",
-          "path": "contracts/NCDTokenSale.sol",
-          "label": "_token",
-          "astId": 191,
+          "contract": "TokenVesting",
+          "path": "contracts/TokenVesting.sol",
+          "label": "_beneficiary",
+          "astId": 1216,
           "type": "t_address",
-          "src": "474:23:2"
+          "src": "1563:28:4"
         },
         {
-          "contract": "NCDTokenSale",
-          "path": "contracts/NCDTokenSale.sol",
-          "label": "_openingTime",
-          "astId": 193,
+          "contract": "TokenVesting",
+          "path": "contracts/TokenVesting.sol",
+          "label": "_cliff",
+          "astId": 1221,
           "type": "t_uint256",
-          "src": "503:28:2"
+          "src": "1830:22:4"
         },
         {
-          "contract": "NCDTokenSale",
-          "path": "contracts/NCDTokenSale.sol",
-          "label": "_closingTime",
-          "astId": 195,
+          "contract": "TokenVesting",
+          "path": "contracts/TokenVesting.sol",
+          "label": "_start",
+          "astId": 1223,
           "type": "t_uint256",
-          "src": "537:28:2"
+          "src": "1858:22:4"
         },
         {
-          "contract": "NCDTokenSale",
-          "path": "contracts/NCDTokenSale.sol",
-          "label": "_teamTokensTotal",
-          "astId": 197,
+          "contract": "TokenVesting",
+          "path": "contracts/TokenVesting.sol",
+          "label": "_periodLength",
+          "astId": 1225,
           "type": "t_uint256",
-          "src": "572:32:2"
+          "src": "1886:29:4"
         },
         {
-          "contract": "NCDTokenSale",
-          "path": "contracts/NCDTokenSale.sol",
-          "label": "_teamTokensUnreleased",
-          "astId": 199,
+          "contract": "TokenVesting",
+          "path": "contracts/TokenVesting.sol",
+          "label": "_periodRate",
+          "astId": 1227,
           "type": "t_uint256",
-          "src": "610:37:2"
+          "src": "1921:27:4"
         },
         {
-          "contract": "NCDTokenSale",
-          "path": "contracts/NCDTokenSale.sol",
-          "label": "_teamTokensReleased",
-          "astId": 201,
-          "type": "t_uint256",
-          "src": "653:35:2"
+          "contract": "TokenVesting",
+          "path": "contracts/TokenVesting.sol",
+          "label": "_released",
+          "astId": 1231,
+          "type": "t_mapping<t_uint256>",
+          "src": "1955:46:4"
         },
         {
-          "contract": "NCDTokenSale",
-          "path": "contracts/NCDTokenSale.sol",
-          "label": "_timeLocks",
-          "astId": 204,
-          "type": "t_array:dyn<t_address>",
-          "src": "781:34:2"
+          "contract": "TokenVesting",
+          "path": "contracts/TokenVesting.sol",
+          "label": "_revoked",
+          "astId": 1235,
+          "type": "t_mapping<t_bool>",
+          "src": "2007:42:4"
         },
         {
-          "contract": "NCDTokenSale",
-          "path": "contracts/NCDTokenSale.sol",
-          "label": "_vestingPeriodsStart",
-          "astId": 207,
-          "type": "t_array:dyn<t_uint256>",
-          "src": "905:38:2"
+          "contract": "TokenVesting",
+          "path": "contracts/TokenVesting.sol",
+          "label": "______gap",
+          "astId": 1572,
+          "type": "t_array:50<t_uint256>",
+          "src": "6920:29:4"
         }
       ],
       "warnings": {
@@ -194,7 +157,7 @@
       }
     },
     "NCDToken": {
-      "address": "0xc6e32E585dBFF0C023CBF9Fa3fe3014Ad7d230d2",
+      "address": "0x6A30B7F19D0fc9D93001E1cea75C81Bf41349dEC",
       "constructorCode": "608060405234801561001057600080fd5b50611850806100206000396000f3fe",
       "bodyBytecodeHash": "06600ab806a12f6ab65d1b8057174a815fdfdcbf1198ae6981b097b6d879f086",
       "localBytecodeHash": "695abf48aa5be8bc8406941448f215e1ff6d2ac595be9bd39ad53ec41fdca102",
@@ -412,15 +375,34 @@
         "hasSelfDestruct": false,
         "hasDelegateCall": false,
         "hasInitialValuesInDeclarations": false,
-        "uninitializedBaseContracts": []
+        "uninitializedBaseContracts": [],
+        "storageUncheckedVars": [
+          {
+            "contract": "MinterRole",
+            "path": "openzeppelin-eth/contracts/access/roles/MinterRole.sol",
+            "label": "_minters",
+            "astId": 1768,
+            "type": "t_struct<Roles.Role>",
+            "src": "271:27:9"
+          },
+          {
+            "contract": "PauserRole",
+            "path": "openzeppelin-eth/contracts/access/roles/PauserRole.sol",
+            "label": "_pausers",
+            "astId": 1887,
+            "type": "t_struct<Roles.Role>",
+            "src": "271:27:10"
+          }
+        ],
+        "storageDiff": []
       }
     },
-    "TokenVesting": {
-      "address": "0x009E273eDd7Ae74525ed62b7da79ee9f530Fedd0",
-      "constructorCode": "608060405234801561001057600080fd5b50610ed7806100206000396000f3fe",
-      "bodyBytecodeHash": "5b74825028033f75fb9e7786f5f308d014c619fdf482a640e2512897f0bb776d",
-      "localBytecodeHash": "0d8da2c25128860313d72027b622a009cf26e6332e340673801a497f0ca8cf89",
-      "deployedBytecodeHash": "0d8da2c25128860313d72027b622a009cf26e6332e340673801a497f0ca8cf89",
+    "NCDTokenSale": {
+      "address": "0x1Fc50eF1b95a1Cde5801438a46dAA8D602E1c882",
+      "constructorCode": "608060405234801561001057600080fd5b50611838806100206000396000f3fe",
+      "bodyBytecodeHash": "ebcc607b5de46d960a958cf9afa4aec7a6d319dbf2d4801c4f89a9ffc00d6bec",
+      "localBytecodeHash": "0e73659375cd8f5481e36c2313d095c3404ac3afb0a58957b17805455dc50545",
+      "deployedBytecodeHash": "0e73659375cd8f5481e36c2313d095c3404ac3afb0a58957b17805455dc50545",
       "types": {
         "t_bool": {
           "id": "t_bool",
@@ -444,173 +426,23 @@
           "kind": "elementary",
           "label": "address"
         },
-        "t_mapping<t_uint256>": {
-          "id": "t_mapping<t_uint256>",
-          "valueType": "t_uint256",
-          "label": "mapping(key => uint256)",
-          "kind": "mapping"
+        "t_struct<Roles.Role>": {
+          "id": "t_struct<Roles.Role>",
+          "kind": "struct",
+          "label": "Roles.Role",
+          "members": [
+            {
+              "label": "bearer",
+              "astId": 1661,
+              "type": "t_mapping<t_bool>",
+              "src": "150:32:8"
+            }
+          ]
         },
         "t_mapping<t_bool>": {
           "id": "t_mapping<t_bool>",
           "valueType": "t_bool",
           "label": "mapping(key => bool)",
-          "kind": "mapping"
-        }
-      },
-      "storage": [
-        {
-          "contract": "Initializable",
-          "path": "zos-lib/contracts/Initializable.sol",
-          "label": "initialized",
-          "astId": 3453,
-          "type": "t_bool",
-          "src": "757:24:21"
-        },
-        {
-          "contract": "Initializable",
-          "path": "zos-lib/contracts/Initializable.sol",
-          "label": "initializing",
-          "astId": 3455,
-          "type": "t_bool",
-          "src": "876:25:21"
-        },
-        {
-          "contract": "Initializable",
-          "path": "zos-lib/contracts/Initializable.sol",
-          "label": "______gap",
-          "astId": 3511,
-          "type": "t_array:50<t_uint256>",
-          "src": "1951:29:21"
-        },
-        {
-          "contract": "Ownable",
-          "path": "openzeppelin-eth/contracts/ownership/Ownable.sol",
-          "label": "_owner",
-          "astId": 2338,
-          "type": "t_address",
-          "src": "302:22:13"
-        },
-        {
-          "contract": "Ownable",
-          "path": "openzeppelin-eth/contracts/ownership/Ownable.sol",
-          "label": "______gap",
-          "astId": 2449,
-          "type": "t_array:50<t_uint256>",
-          "src": "2186:29:13"
-        },
-        {
-          "contract": "TokenVesting",
-          "path": "contracts/TokenVesting.sol",
-          "label": "_beneficiary",
-          "astId": 1234,
-          "type": "t_address",
-          "src": "1760:28:4"
-        },
-        {
-          "contract": "TokenVesting",
-          "path": "contracts/TokenVesting.sol",
-          "label": "_cliff",
-          "astId": 1239,
-          "type": "t_uint256",
-          "src": "2027:22:4"
-        },
-        {
-          "contract": "TokenVesting",
-          "path": "contracts/TokenVesting.sol",
-          "label": "_start",
-          "astId": 1241,
-          "type": "t_uint256",
-          "src": "2055:22:4"
-        },
-        {
-          "contract": "TokenVesting",
-          "path": "contracts/TokenVesting.sol",
-          "label": "_periodLength",
-          "astId": 1243,
-          "type": "t_uint256",
-          "src": "2083:29:4"
-        },
-        {
-          "contract": "TokenVesting",
-          "path": "contracts/TokenVesting.sol",
-          "label": "_periodRate",
-          "astId": 1245,
-          "type": "t_uint256",
-          "src": "2118:27:4"
-        },
-        {
-          "contract": "TokenVesting",
-          "path": "contracts/TokenVesting.sol",
-          "label": "_released",
-          "astId": 1249,
-          "type": "t_mapping<t_uint256>",
-          "src": "2152:46:4"
-        },
-        {
-          "contract": "TokenVesting",
-          "path": "contracts/TokenVesting.sol",
-          "label": "_revoked",
-          "astId": 1253,
-          "type": "t_mapping<t_bool>",
-          "src": "2204:42:4"
-        },
-        {
-          "contract": "TokenVesting",
-          "path": "contracts/TokenVesting.sol",
-          "label": "______gap",
-          "astId": 1688,
-          "type": "t_array:50<t_uint256>",
-          "src": "8354:29:4"
-        }
-      ],
-      "warnings": {
-        "hasConstructor": false,
-        "hasSelfDestruct": false,
-        "hasDelegateCall": false,
-        "hasInitialValuesInDeclarations": false,
-        "uninitializedBaseContracts": [],
-        "storageUncheckedVars": [],
-        "storageDiff": []
-      }
-    },
-    "TeamVesting": {
-      "address": "0x4A4FD13590B1bc0f9D4a8Aad82bead47Cf899065",
-      "constructorCode": "608060405234801561001057600080fd5b50610ef7806100206000396000f3fe",
-      "bodyBytecodeHash": "b53e3758daf852c89b452da9c856cd49b0aad5ea4b7587dcdb0c32cd7c882184",
-      "localBytecodeHash": "159d752457b600a8471e5eb1e2feb2eceb7fb47843dceca5ebede711a31da7c6",
-      "deployedBytecodeHash": "159d752457b600a8471e5eb1e2feb2eceb7fb47843dceca5ebede711a31da7c6",
-      "types": {
-        "t_bool": {
-          "id": "t_bool",
-          "kind": "elementary",
-          "label": "bool"
-        },
-        "t_uint256": {
-          "id": "t_uint256",
-          "kind": "elementary",
-          "label": "uint256"
-        },
-        "t_array:50<t_uint256>": {
-          "id": "t_array:50<t_uint256>",
-          "valueType": "t_uint256",
-          "length": "50",
-          "kind": "array",
-          "label": "uint256[50]"
-        },
-        "t_address": {
-          "id": "t_address",
-          "kind": "elementary",
-          "label": "address"
-        },
-        "t_uint8": {
-          "id": "t_uint8",
-          "kind": "elementary",
-          "label": "uint8"
-        },
-        "t_mapping<t_uint8>": {
-          "id": "t_mapping<t_uint8>",
-          "valueType": "t_uint8",
-          "label": "mapping(key => uint8)",
           "kind": "mapping"
         },
         "t_array:dyn<t_address>": {
@@ -620,11 +452,12 @@
           "kind": "array",
           "label": "address[]"
         },
-        "t_mapping<t_uint256>": {
-          "id": "t_mapping<t_uint256>",
+        "t_array:dyn<t_uint256>": {
+          "id": "t_array:dyn<t_uint256>",
           "valueType": "t_uint256",
-          "label": "mapping(key => uint256)",
-          "kind": "mapping"
+          "length": "dyn",
+          "kind": "array",
+          "label": "uint256[]"
         }
       },
       "storage": [
@@ -632,7 +465,7 @@
           "contract": "Initializable",
           "path": "zos-lib/contracts/Initializable.sol",
           "label": "initialized",
-          "astId": 3453,
+          "astId": 3337,
           "type": "t_bool",
           "src": "757:24:21"
         },
@@ -640,7 +473,7 @@
           "contract": "Initializable",
           "path": "zos-lib/contracts/Initializable.sol",
           "label": "initializing",
-          "astId": 3455,
+          "astId": 3339,
           "type": "t_bool",
           "src": "876:25:21"
         },
@@ -648,7 +481,7 @@
           "contract": "Initializable",
           "path": "zos-lib/contracts/Initializable.sol",
           "label": "______gap",
-          "astId": 3511,
+          "astId": 3395,
           "type": "t_array:50<t_uint256>",
           "src": "1951:29:21"
         },
@@ -656,7 +489,7 @@
           "contract": "Ownable",
           "path": "openzeppelin-eth/contracts/ownership/Ownable.sol",
           "label": "_owner",
-          "astId": 2338,
+          "astId": 2222,
           "type": "t_address",
           "src": "302:22:13"
         },
@@ -664,57 +497,89 @@
           "contract": "Ownable",
           "path": "openzeppelin-eth/contracts/ownership/Ownable.sol",
           "label": "______gap",
-          "astId": 2449,
+          "astId": 2333,
           "type": "t_array:50<t_uint256>",
           "src": "2186:29:13"
         },
         {
-          "contract": "TeamVesting",
-          "path": "contracts/TeamVesting.sol",
-          "label": "_beneficiaryFactors",
-          "astId": 752,
-          "type": "t_mapping<t_uint8>",
-          "src": "1401:53:3"
+          "contract": "MinterRole",
+          "path": "openzeppelin-eth/contracts/access/roles/MinterRole.sol",
+          "label": "_minters",
+          "astId": 1768,
+          "type": "t_struct<Roles.Role>",
+          "src": "271:27:9"
         },
         {
-          "contract": "TeamVesting",
-          "path": "contracts/TeamVesting.sol",
-          "label": "_beneficiaries",
-          "astId": 755,
-          "type": "t_array:dyn<t_address>",
-          "src": "1495:32:3"
+          "contract": "MinterRole",
+          "path": "openzeppelin-eth/contracts/access/roles/MinterRole.sol",
+          "label": "______gap",
+          "astId": 1867,
+          "type": "t_array:50<t_uint256>",
+          "src": "1081:29:9"
         },
         {
-          "contract": "TeamVesting",
-          "path": "contracts/TeamVesting.sol",
+          "contract": "NCDTokenSale",
+          "path": "contracts/NCDTokenSale.sol",
           "label": "_token",
-          "astId": 757,
+          "astId": 191,
           "type": "t_address",
-          "src": "1579:21:3"
+          "src": "474:23:2"
         },
         {
-          "contract": "TeamVesting",
-          "path": "contracts/TeamVesting.sol",
-          "label": "_vestedBalances",
-          "astId": 763,
-          "type": "t_mapping<t_uint256>",
-          "src": "1660:74:3"
+          "contract": "NCDTokenSale",
+          "path": "contracts/NCDTokenSale.sol",
+          "label": "_openingTime",
+          "astId": 193,
+          "type": "t_uint256",
+          "src": "503:28:2"
         },
         {
-          "contract": "TeamVesting",
-          "path": "contracts/TeamVesting.sol",
-          "label": "_releasedBalances",
-          "astId": 769,
-          "type": "t_mapping<t_uint256>",
-          "src": "1816:76:3"
+          "contract": "NCDTokenSale",
+          "path": "contracts/NCDTokenSale.sol",
+          "label": "_closingTime",
+          "astId": 195,
+          "type": "t_uint256",
+          "src": "537:28:2"
         },
         {
-          "contract": "TeamVesting",
-          "path": "contracts/TeamVesting.sol",
-          "label": "_vestingBalances",
-          "astId": 773,
-          "type": "t_mapping<t_uint256>",
-          "src": "1939:53:3"
+          "contract": "NCDTokenSale",
+          "path": "contracts/NCDTokenSale.sol",
+          "label": "_teamTokensTotal",
+          "astId": 197,
+          "type": "t_uint256",
+          "src": "572:32:2"
+        },
+        {
+          "contract": "NCDTokenSale",
+          "path": "contracts/NCDTokenSale.sol",
+          "label": "_teamTokensUnreleased",
+          "astId": 199,
+          "type": "t_uint256",
+          "src": "610:37:2"
+        },
+        {
+          "contract": "NCDTokenSale",
+          "path": "contracts/NCDTokenSale.sol",
+          "label": "_teamTokensReleased",
+          "astId": 201,
+          "type": "t_uint256",
+          "src": "653:35:2"
+        },
+        {
+          "contract": "NCDTokenSale",
+          "path": "contracts/NCDTokenSale.sol",
+          "label": "_timeLocks",
+          "astId": 204,
+          "type": "t_array:dyn<t_address>",
+          "src": "781:34:2"
+        },
+        {
+          "contract": "NCDTokenSale",
+          "path": "contracts/NCDTokenSale.sol",
+          "label": "_vestingPeriodsStart",
+          "astId": 207,
+          "type": "t_array:dyn<t_uint256>",
+          "src": "905:38:2"
         }
       ],
       "warnings": {
@@ -727,64 +592,13 @@
     }
   },
   "solidityLibs": {},
-  "proxies": {
-    "ncdt/NCDToken": [
-      {
-        "address": "0xE0C8b298db4cfFE05d1bEA0bb1BA414522B33C1B",
-        "version": "v1.3.0",
-        "implementation": "0xc6e32E585dBFF0C023CBF9Fa3fe3014Ad7d230d2",
-        "kind": "Upgradeable"
-      }
-    ],
-    "ncdt/NCDTokenSale": [
-      {
-        "address": "0x09c736B404889b48e5BC174232F91FF45886809e",
-        "version": "v1.3.0",
-        "implementation": "0x6C861114DdbC30Fb266F8DaC5b386528A8E3Cf90",
-        "admin": "0xd0abFeF60B4D3B6DaA26EfA17653cDE26453B5A0",
-        "kind": "Upgradeable"
-      }
-    ],
-    "ncdt/TokenVesting": [
-      {
-        "address": "0x1B22b490C6C3aa5FA8fa16d5f4dcE94be7d1E1fE",
-        "version": "v1.3.0",
-        "implementation": "0x009E273eDd7Ae74525ed62b7da79ee9f530Fedd0",
-        "admin": "0xd0abFeF60B4D3B6DaA26EfA17653cDE26453B5A0",
-        "kind": "Upgradeable"
-      },
-      {
-        "address": "0xe7292Af83383cD066bF19C36Cd2E05183254581f",
-        "version": "v1.3.0",
-        "implementation": "0x009E273eDd7Ae74525ed62b7da79ee9f530Fedd0",
-        "admin": "0xd0abFeF60B4D3B6DaA26EfA17653cDE26453B5A0",
-        "kind": "Upgradeable"
-      },
-      {
-        "address": "0x0facdf8718f5f4e445A3368653E448a6BBD2454d",
-        "version": "v1.3.0",
-        "implementation": "0x009E273eDd7Ae74525ed62b7da79ee9f530Fedd0",
-        "admin": "0xd0abFeF60B4D3B6DaA26EfA17653cDE26453B5A0",
-        "kind": "Upgradeable"
-      },
-      {
-        "address": "0x103c95a24068d1F2Bf84CDEC6aA3fE1F8D54F06B",
-        "version": "v1.3.0",
-        "implementation": "0x009E273eDd7Ae74525ed62b7da79ee9f530Fedd0",
-        "admin": "0xd0abFeF60B4D3B6DaA26EfA17653cDE26453B5A0",
-        "kind": "Upgradeable"
-      }
-    ]
-  },
+  "proxies": {},
   "zosversion": "2.2",
   "version": "v1.3.0",
   "dependencies": {
     "openzeppelin-eth": {
-      "package": "0x778dddf23ec1b5cb18394c6c110480caadb3b0f6",
+      "package": "0x2a9e7b63514438906a83a1e320dbbd814d417002",
       "version": "2.1.3"
     }
-  },
-  "proxyAdmin": {
-    "address": "0xd0abFeF60B4D3B6DaA26EfA17653cDE26453B5A0"
   }
 }

@@ -1,0 +1,170 @@
+{
+  "contracts": {
+    "TokenVesting": {
+      "address": "0x7352c0481aC94C3713D0611C6EeA2972412B1dC8",
+      "constructorCode": "608060405234801561001057600080fd5b50610cb9806100206000396000f3fe",
+      "bodyBytecodeHash": "cbf41c1c4671c08d9f7e8722841afd7670384ba202af3edb285ba74ecc6199a8",
+      "localBytecodeHash": "1fffff4aca16bfa8a63e16cbf1377456c6bde3a58758456b5e5c028b46f84544",
+      "deployedBytecodeHash": "1fffff4aca16bfa8a63e16cbf1377456c6bde3a58758456b5e5c028b46f84544",
+      "types": {
+        "t_bool": {
+          "id": "t_bool",
+          "kind": "elementary",
+          "label": "bool"
+        },
+        "t_uint256": {
+          "id": "t_uint256",
+          "kind": "elementary",
+          "label": "uint256"
+        },
+        "t_array:50<t_uint256>": {
+          "id": "t_array:50<t_uint256>",
+          "valueType": "t_uint256",
+          "length": "50",
+          "kind": "array",
+          "label": "uint256[50]"
+        },
+        "t_address": {
+          "id": "t_address",
+          "kind": "elementary",
+          "label": "address"
+        },
+        "t_mapping<t_uint256>": {
+          "id": "t_mapping<t_uint256>",
+          "valueType": "t_uint256",
+          "label": "mapping(key => uint256)",
+          "kind": "mapping"
+        },
+        "t_mapping<t_bool>": {
+          "id": "t_mapping<t_bool>",
+          "valueType": "t_bool",
+          "label": "mapping(key => bool)",
+          "kind": "mapping"
+        }
+      },
+      "storage": [
+        {
+          "contract": "Initializable",
+          "path": "zos-lib/contracts/Initializable.sol",
+          "label": "initialized",
+          "astId": 3337,
+          "type": "t_bool",
+          "src": "757:24:21"
+        },
+        {
+          "contract": "Initializable",
+          "path": "zos-lib/contracts/Initializable.sol",
+          "label": "initializing",
+          "astId": 3339,
+          "type": "t_bool",
+          "src": "876:25:21"
+        },
+        {
+          "contract": "Initializable",
+          "path": "zos-lib/contracts/Initializable.sol",
+          "label": "______gap",
+          "astId": 3395,
+          "type": "t_array:50<t_uint256>",
+          "src": "1951:29:21"
+        },
+        {
+          "contract": "Ownable",
+          "path": "openzeppelin-eth/contracts/ownership/Ownable.sol",
+          "label": "_owner",
+          "astId": 2222,
+          "type": "t_address",
+          "src": "302:22:13"
+        },
+        {
+          "contract": "Ownable",
+          "path": "openzeppelin-eth/contracts/ownership/Ownable.sol",
+          "label": "______gap",
+          "astId": 2333,
+          "type": "t_array:50<t_uint256>",
+          "src": "2186:29:13"
+        },
+        {
+          "contract": "TokenVesting",
+          "path": "contracts/TokenVesting.sol",
+          "label": "_beneficiary",
+          "astId": 1216,
+          "type": "t_address",
+          "src": "1563:28:4"
+        },
+        {
+          "contract": "TokenVesting",
+          "path": "contracts/TokenVesting.sol",
+          "label": "_cliff",
+          "astId": 1221,
+          "type": "t_uint256",
+          "src": "1830:22:4"
+        },
+        {
+          "contract": "TokenVesting",
+          "path": "contracts/TokenVesting.sol",
+          "label": "_start",
+          "astId": 1223,
+          "type": "t_uint256",
+          "src": "1858:22:4"
+        },
+        {
+          "contract": "TokenVesting",
+          "path": "contracts/TokenVesting.sol",
+          "label": "_periodLength",
+          "astId": 1225,
+          "type": "t_uint256",
+          "src": "1886:29:4"
+        },
+        {
+          "contract": "TokenVesting",
+          "path": "contracts/TokenVesting.sol",
+          "label": "_periodRate",
+          "astId": 1227,
+          "type": "t_uint256",
+          "src": "1921:27:4"
+        },
+        {
+          "contract": "TokenVesting",
+          "path": "contracts/TokenVesting.sol",
+          "label": "_released",
+          "astId": 1231,
+          "type": "t_mapping<t_uint256>",
+          "src": "1955:46:4"
+        },
+        {
+          "contract": "TokenVesting",
+          "path": "contracts/TokenVesting.sol",
+          "label": "_revoked",
+          "astId": 1235,
+          "type": "t_mapping<t_bool>",
+          "src": "2007:42:4"
+        },
+        {
+          "contract": "TokenVesting",
+          "path": "contracts/TokenVesting.sol",
+          "label": "______gap",
+          "astId": 1572,
+          "type": "t_array:50<t_uint256>",
+          "src": "6920:29:4"
+        }
+      ],
+      "warnings": {
+        "hasConstructor": false,
+        "hasSelfDestruct": false,
+        "hasDelegateCall": false,
+        "hasInitialValuesInDeclarations": false,
+        "uninitializedBaseContracts": []
+      }
+    }
+  },
+  "solidityLibs": {},
+  "proxies": {},
+  "zosversion": "2.2",
+  "version": "v1.3.0",
+  "dependencies": {
+    "openzeppelin-eth": {
+      "package": "0x2a9e7b63514438906a83a1e320dbbd814d417002",
+      "version": "2.1.3"
+    }
+  }
+}
