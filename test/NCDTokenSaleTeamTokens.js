@@ -176,7 +176,7 @@ contract("CrowdSale TeamToken tests", async ([_, owner, buyer, another, pauser1,
               expect(await this.tokenSale.getTeamTokensUnreleased()).to.be.bignumber.equal('1000');
               expect(await this.tokenSale.getTeamTokensReleased()).to.be.bignumber.equal('0');
 
-              // minting 1000 tokens
+              // minting 500 tokens
               await this.tokenSale.mintTokens(another, 500, {from: owner});
 
               balance = await this.token.balanceOf(another);

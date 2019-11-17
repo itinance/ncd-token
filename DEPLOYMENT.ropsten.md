@@ -136,8 +136,8 @@ Events emitted:
 ### Deploying TokenVesting for second month
 
 - beneficiary (address): "0x2353e45fF9613cFB05CC797E15cC37fd0d7F9658"
-Start: 1561248000 (05/23/2019 @ 12:00am UTC)
-End: 1563926399 (06/23/2019 @ 11:59am (UTC))
+Start: 1561248000 (06/23/2019 @ 12:00am UTC)
+End: 1563926399 (07/23/2019 @ 11:59am (UTC))
 CliffDuration: 2678399
 
  Do you want to call a function on the instance after creating it? Yes
@@ -159,5 +159,34 @@ CliffDuration: 2678399
 0x49Ea11f6233b68368484C7476edaF19C18B3032f
 [2019-08-16T11:27:49.012Z@ZosNetworkFile.js#write] <started> Updated zos.ropsten.json
 
+
+
+
+
+## Test TOken Contract
+
+0x69180509470B5b0493b58a70Ad2CB4388B2CdFd3
+
+♠ zos create --network ropsten --skip-compile --verbose --verbose
+? Pick a contract to instantiate TokenVesting
+[2019-08-16T12:58:02.794Z@NetworkController.js#push] <started> All contracts are up to date
+? Do you want to call a function on the instance after creating it? Yes
+? Select which function * initialize(beneficiary: address, start: uint256, cliffDuration: uint256, periodLength: uint256, periodRate: uint256, owner: address)
+? beneficiary (address): 0x2353e45fF9613cFB05CC797E15cC37fd0d7F9658
+? start (uint256): 1565960314
+? cliffDuration (uint256): 100
+? periodLength (uint256): 30
+? periodRate (uint256): 10
+? owner (address): 0x2353e45fF9613cFB05CC797E15cC37fd0d7F9658
+[2019-08-16T12:59:45.437Z@BaseSimpleProject.js#_getAndLogInitCallData] <started> Creating instance for contract at 0x0C19D6baEF6Eb7C1889Dc12F26896B61b56dbfFf and calling 'initialize' with:
+- beneficiary (address): "0x2353e45fF9613cFB05CC797E15cC37fd0d7F9658"
+- start (uint256): "1565960314"
+- cliffDuration (uint256): "100"
+- periodLength (uint256): "30"
+- periodRate (uint256): "10"
+- owner (address): "0x2353e45fF9613cFB05CC797E15cC37fd0d7F9658"
+[2019-08-16T12:59:58.327Z@BaseSimpleProject.js#_getAndLogInitCallData] <succeeded> Instance created at 0x69180509470B5b0493b58a70Ad2CB4388B2CdFd3
+0x69180509470B5b0493b58a70Ad2CB4388B2CdFd3
+[2019-08-16T12:59:59.061Z@ZosNetworkFile.js#write] <started> Updated zos.ropsten.json
 
 

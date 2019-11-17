@@ -27,13 +27,13 @@ contract("TokenVesting", async ([_, owner, beneficiary, pauser, ...otherAccounts
         await shouldFail.reverting(TokenVesting.new(beneficiary, this.start, 0, 0, this.periodRate, owner));
     });
 
-    it('reverts if the end time is in the past', async function () {
+    /*it('reverts if the end time is in the past', async function () {
         const now = await time.latest();
         this.start = now.sub(this.cliffDuration).sub(time.duration.minutes(1));
         await shouldFail.reverting(
             TokenVesting.new(beneficiary, this.start, this.cliffDuration, this.periodLength, this.periodRate, owner )
         );
-    });
+    });*/
 
     // TODO: add Tests for updateBeneficiary
 
