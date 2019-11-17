@@ -5,7 +5,8 @@
   "contracts": {
     "NCDToken": "NCDToken",
     "NCDTokenSale": "NCDTokenSale",
-    "TokenVesting": "TokenVesting"
+    "TokenVesting": "TokenVesting",
+    "TeamVesting": "TeamVesting"
   },
   "dependencies": {
     "openzeppelin-eth": "^2.1.3"
