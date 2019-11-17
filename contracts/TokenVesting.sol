@@ -34,6 +34,11 @@ contract TokenVesting is Initializable, Ownable, ITokenVesting {
      */
     event BeneficiaryUpdate(address beneficiary, address oldBeneficiary);
 
+    event CliffUpdate(uint256 oldCliff, uint256 newCliff);
+
+    event PeriodLengthUpdate(uint256 oldValue, uint256 periodLength);
+    event PeriodRateUpdate(uint256 oldValue, uint256 periodRate);
+
     // beneficiary of tokens after they are released
     address private _beneficiary;
 
@@ -70,7 +75,7 @@ contract TokenVesting is Initializable, Ownable, ITokenVesting {
         require(cliffDuration > 0, "TokenVesting: cliff must be > 0" );
         require(periodLength > 0, "TokenVesting: periodLength must be > 0");
         require(periodRate > 0, "TokenVesting: periodRate must be > 0");
-        require(start.add(cliffDuration) > block.timestamp, "TokenVesting: end of cliff period must be in future");
+        //require(start.add(cliffDuration) > block.timestamp, "TokenVesting: end of cliff period must be in future");
 
         _beneficiary = beneficiary;
         _periodLength = periodLength;
@@ -103,6 +108,15 @@ contract TokenVesting is Initializable, Ownable, ITokenVesting {
         return _cliff;
     }
 
+    function updateCliff(uint256 newCliff) external onlyOwner {
+        require(_cliff > _start, "Cliff must be higher than start");
+
+        uint256 oldValue = _cliff;
+        _cliff = newCliff;
+
+        emit CliffUpdate(oldValue, _cliff);
+    }
+
     /**
      * @return the start time of the token vesting.
      */
@@ -115,6 +129,24 @@ contract TokenVesting is Initializable, Ownable, ITokenVesting {
      */
     function periodLength() external view returns (uint256) {
         return _periodLength;
+    }
+
+    function updatePeriodLength(uint256 _newLength) external onlyOwner {
+        require(_newLength > 0);
+
+        uint256 oldValue = _periodLength;
+        _periodLength = _newLength;
+
+        emit PeriodLengthUpdate(oldValue, _newLength);
+    }
+
+    function updatePeriodRate(uint256 _newRate) external onlyOwner {
+        require(_newRate > 0);
+
+        uint256 oldValue = _periodRate;
+        _periodRate = _newRate;
+
+        emit PeriodLengthUpdate(oldValue, _newRate);
     }
 
     /**

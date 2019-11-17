@@ -13,7 +13,6 @@ import "openzeppelin-eth/contracts/token/ERC20/SafeERC20.sol";
  * Vestor 1 with 93% of vesting token  and Vestor 2 with 7 % of vesting token (referring to the NUCO-Whitepaper)
  *
  * Sold Token
- * TODO: ownership / vesting role required
  */
 contract TeamVesting is Initializable, Ownable {
     using SafeMath for uint256;
@@ -21,7 +20,6 @@ contract TeamVesting is Initializable, Ownable {
 
     // The amount of vesting periods (ideal 31-day-months) that are required to release any tokens
     uint8 private constant MINIMUM_VESTING_PERIODS = 12;
-
 
     event AddedBeneficiary(
         address beneficiary,
@@ -43,7 +41,7 @@ contract TeamVesting is Initializable, Ownable {
     // all beneficiaries as array
     address[] private _beneficiaries;
 
-   // ERC20 basic token contract being held
+    // ERC20 basic token contract being held
     IERC20 private _token;
 
     // month => address => amount of available token

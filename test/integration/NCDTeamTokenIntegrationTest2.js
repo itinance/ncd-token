@@ -12,6 +12,7 @@ const ONE_YEAR_IN_SECONDS = 86400 * 31 * 12; // SIMPLIFIED FOR our tests here (3
 const ONE_MONTH_PERIOD_IN_SECONDS = 86400 * 31; // 31 days for a ideal month
 const RELEASE_RATE_PER_MONTH = 10;
 
+
 contract("TeamToken Integration tests", async ([_, owner, buyer, another, vesting, pauser1, pauser2, vestor1, vestor2, ...otherAccounts]) => {
 
     before(async function () {
@@ -157,7 +158,7 @@ contract("TeamToken Integration tests", async ([_, owner, buyer, another, vestin
           expect(saldo).to.equal(300);
         });
 
-        it('has minted all tokens', async function() {
+        it('has minted all tokens 2', async function() {
           expect(await this.token.balanceOf(buyer)).to.be.bignumber.equal('300');
         })
 

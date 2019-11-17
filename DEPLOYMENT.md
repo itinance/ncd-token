@@ -54,7 +54,8 @@ $ zos verify --remote etherscan --network main --api-key xxxx
 ? Was the optimizer enabled when you compiled your contracts? Yes
 ? Specify the optimizer runs 200
 Using session with network main, sender address 0x078dC1BAc6570cA60b00bb4Ba2a37aE3C3F25CC6, timeout 1000000 seconds
-✓ Contract source code of NCDToken verified and published successfully. You can check it here: https://etherscan.io/address/0xc6e32E585dBFF0C023CBF9Fa3fe3014Ad7d230d2#code
+✓ Contra
+ct source code of NCDToken verified and published successfully. You can check it here: https://etherscan.io/address/0xc6e32E585dBFF0C023CBF9Fa3fe3014Ad7d230d2#code
 ```
 
 ## 2.2. NCDTokenSale

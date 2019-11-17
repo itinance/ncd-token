@@ -12,6 +12,7 @@ const ONE_YEAR_IN_SECONDS = 86400 * 31 * 12; // SIMPLIFIED FOR our tests here (3
 const ONE_MONTH_PERIOD_IN_SECONDS = 86400 * 31; // 31 days for a ideal month
 const RELEASE_RATE_PER_MONTH = 10;
 
+return;
 contract("TeamToken Integration tests", async ([_, owner, buyer, another, vesting, pauser1, pauser2, vestor1, vestor2, ...otherAccounts]) => {
 
     before(async function () {
