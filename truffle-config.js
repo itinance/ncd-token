@@ -1,7 +1,7 @@
 const path = require("path");
 require('dotenv').config();
 
-const HDWalletProvider = require("truffle-hdwallet-provider");
+const HDWalletProvider = require("@truffle/hdwallet-provider");
 const infuraProjectId = process.env.INFURA_API_KEY;
 
 
@@ -55,8 +55,8 @@ module.exports = {
     main: {
       provider: () => new HDWalletProvider(process.env.MAIN_MNEMONIC, "https://mainnet.infura.io/v3/" + infuraProjectId),
       network_id: 1,
-      gas: 3000000,
-      gasPrice: 20000000000
+      gas: 260000,
+      gasPrice: 131000000000
     },
     coverage: {
       host: "localhost",

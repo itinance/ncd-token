@@ -16,5 +16,6 @@
     "compilerSettings": {
       "optimizer": {}
     }
-  }
+  },
+  "telemetryOptIn": false
 }

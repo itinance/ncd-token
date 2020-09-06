@@ -25,10 +25,11 @@
   },
   "homepage": "https://nuco.cloud",
   "dependencies": {
-    "openzeppelin-eth": "^2.2.0",
-    "web3": "^1.2.7",
     "@openzeppelin/cli": "^2.8.2",
-    "@openzeppelin/upgrades": "^2.8.0"
+    "@openzeppelin/contract-loader": "^0.6.1",
+    "@openzeppelin/upgrades": "^2.8.0",
+    "openzeppelin-eth": "^2.2.0",
+    "web3": "^1.2.11"
   },
   "devDependencies": {
     "@openzeppelin/test-helpers": "^0.5.5",
